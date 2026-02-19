@@ -4,6 +4,15 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
-    --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-green: #5E7052;
+    --color-brand-light-green: #D4E5D0;
+    --color-brand-muted-green: #A8B5A0;
+    --color-brand-accent-brown: #8B6F47;
+    --color-brand-cream: #FAF6F1;
+    --color-brand-icon-bg-green: #D4E5D0;
+    --color-brand-icon-bg-brown: #E8DCC8;
+    --color-brand-muted-text: #6B7B63;
 }
