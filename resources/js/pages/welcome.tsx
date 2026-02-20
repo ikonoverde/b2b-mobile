@@ -55,7 +55,7 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
                         </div>
                         <span className="text-[13px] font-semibold text-white">Crear Cuenta</span>
                     </Link>
-                    <Link href="/login" className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4">
+                    <Link href="/catalog" className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-icon-bg-green">
                             <Grid className="h-6 w-6 text-brand-green" />
                         </div>
@@ -68,7 +68,7 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
             <div className="flex flex-col gap-4 px-6 pt-2">
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-bold text-brand-green">Productos Destacados</h2>
-                    <Link href="/login" className="text-[13px] font-semibold text-brand-accent-brown">
+                    <Link href="/catalog" className="text-[13px] font-semibold text-brand-accent-brown">
                         Ver todo
                     </Link>
                 </div>

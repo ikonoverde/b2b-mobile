@@ -15,4 +15,20 @@ class ProductService
     {
         return $this->apiClient->get('/products/featured')->json();
     }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function getProducts(): array
+    {
+        return $this->apiClient->get('/products')->json();
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function getProduct(int $id): array
+    {
+        return $this->apiClient->get("/products/{$id}")->json();
+    }
 }
