@@ -29,17 +29,22 @@
                 :active="request()->routeIs('home')"
             />
             <native:bottom-nav-item
-                id="catalog"
-                icon="grid_view"
-                label="Catalog"
-                url="/catalog"
+                id="account"
+                icon="person"
+                label="Account"
+                url="/account"
             />
             <native:bottom-nav-item
-                id="login"
-                icon="login"
-                label="Login"
-                url="/login"
-                :active="request()->routeIs('login')"
+                id="cart"
+                icon="shopping_cart"
+                label="Cart"
+                url="/cart"
+            />
+            <native:bottom-nav-item
+                id="menu"
+                icon="menu"
+                label="Menu"
+                url="/menu"
             />
         </native:bottom-nav>
     </body>

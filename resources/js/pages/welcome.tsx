@@ -1,14 +1,15 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Grid, Headphones, Percent, Truck, UserPlus } from 'lucide-react';
 
 import { BenefitCard } from '@/components/home/BenefitCard';
-import { ProductCard } from '@/components/home/ProductCard';
+import { ProductCard } from '@/components/products/ProductCard';
+import { Auth } from '@/types/auth';
 
 interface Product {
     id: number;
     name: string;
     category: string;
-    price: string;
+    price: number;
     image: string;
 }
 
@@ -17,6 +18,8 @@ interface WelcomeProps {
 }
 
 export default function Welcome({ featuredProducts }: WelcomeProps) {
+    const { auth } = usePage<{ auth: Auth }>().props;
+
     return (
         <>
             <Head title="IKONO VERDE PROFESIONAL">
@@ -44,20 +47,22 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
             </div>
 
             {/* CTA Section */}
-            <div className="flex flex-col gap-3 px-6 pb-2">
-                <Link href="/register" className="flex flex-col items-center gap-3 rounded-2xl bg-brand-green p-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
-                        <UserPlus className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-[13px] font-semibold text-white">Crear Cuenta</span>
-                </Link>
-                <Link href="/login" className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                        <Grid className="h-6 w-6 text-brand-green" />
-                    </div>
-                    <span className="text-[13px] font-semibold text-brand-green">Ver Catálogo</span>
-                </Link>
-            </div>
+            {!auth.user && (
+                <div className="flex flex-col gap-3 px-6 pb-2">
+                    <Link href="/register" className="flex flex-col items-center gap-3 rounded-2xl bg-brand-green p-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
+                            <UserPlus className="h-6 w-6 text-white" />
+                        </div>
+                        <span className="text-[13px] font-semibold text-white">Crear Cuenta</span>
+                    </Link>
+                    <Link href="/login" className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-icon-bg-green">
+                            <Grid className="h-6 w-6 text-brand-green" />
+                        </div>
+                        <span className="text-[13px] font-semibold text-brand-green">Ver Catálogo</span>
+                    </Link>
+                </div>
+            )}
 
             {/* Featured Products */}
             <div className="flex flex-col gap-4 px-6 pt-2">
@@ -67,15 +72,16 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
                         Ver todo
                     </Link>
                 </div>
-                <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-1">
+                <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2">
                     {featuredProducts.map((product) => (
                         <ProductCard
                             key={product.id}
+                            id={product.id}
                             imageUrl={product.image}
                             name={product.name}
                             size={product.category}
                             price={product.price}
-                            showPrice={false}
+                            showPrice={!!auth.user}
                         />
                     ))}
                 </div>
