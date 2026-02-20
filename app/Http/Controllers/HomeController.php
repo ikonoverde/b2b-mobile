@@ -16,6 +16,8 @@ class HomeController extends Controller
     {
         $featuredProducts = $productService->getFeaturedProducts();
 
-        return Inertia::render('welcome', ['featuredProducts' => $featuredProducts['data']]);
+        return Inertia::render('welcome', [
+            'featuredProducts' => $featuredProducts['data'],
+        ]);
     }
 }

@@ -19,5 +19,28 @@
     </head>
     <body class="font-sans antialiased nativephp-safe-area">
         @inertia
+
+        <native:bottom-nav label-visibility="labeled">
+            <native:bottom-nav-item
+                id="home"
+                icon="home"
+                label="Home"
+                url="/"
+                :active="request()->routeIs('home')"
+            />
+            <native:bottom-nav-item
+                id="catalog"
+                icon="grid_view"
+                label="Catalog"
+                url="/catalog"
+            />
+            <native:bottom-nav-item
+                id="login"
+                icon="login"
+                label="Login"
+                url="/login"
+                :active="request()->routeIs('login')"
+            />
+        </native:bottom-nav>
     </body>
 </html>

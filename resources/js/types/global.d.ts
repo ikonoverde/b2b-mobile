@@ -1,4 +1,11 @@
+import type { Router } from '@inertiajs/core';
 import type { Auth } from '@/types/auth';
+
+declare global {
+    interface Window {
+        router: Router;
+    }
+}
 
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
