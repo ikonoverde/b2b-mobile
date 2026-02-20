@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 export function ProductCard({ imageUrl, name, size, price, showPrice = true }: ProductCardProps) {
     return (
-        <div className="flex-1 overflow-hidden rounded-2xl bg-white">
+        <div className="w-40 shrink-0 overflow-hidden rounded-2xl bg-white">
             <img src={imageUrl} alt={name} className="h-20 w-full object-cover" />
             <div className="flex flex-col gap-1 p-3">
                 <span className="text-[13px] font-semibold text-brand-green">{name}</span>

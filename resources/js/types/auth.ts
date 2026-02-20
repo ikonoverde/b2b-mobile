@@ -1,7 +1,10 @@
 export type User = {
     id: number;
     name: string;
+    rfc: string | null;
     email: string;
+    phone: string | null;
+    terms_accepted: boolean;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;

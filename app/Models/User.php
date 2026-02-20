@@ -19,8 +19,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'rfc',
         'email',
+        'phone',
         'password',
+        'terms_accepted',
     ];
 
     /**
@@ -43,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'terms_accepted' => 'boolean',
         ];
     }
 }
