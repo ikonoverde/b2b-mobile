@@ -3,7 +3,7 @@ import type { InputHTMLAttributes, ReactNode } from 'react';
 
 interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> {
     label: string;
-    icon: LucideIcon;
+    icon?: LucideIcon;
     error?: string;
     rightElement?: ReactNode;
 }
@@ -17,7 +17,7 @@ export function TextInput({ label, icon: Icon, error, rightElement, ...props }: 
                     error ? 'border-red-500' : 'border-transparent'
                 }`}
             >
-                <Icon className="h-5 w-5 shrink-0 text-brand-muted-green" />
+                {Icon && <Icon className="h-5 w-5 shrink-0 text-brand-muted-green" />}
                 <input
                     className="flex-1 bg-transparent text-base text-brand-green placeholder:text-brand-muted-green outline-none"
                     {...props}

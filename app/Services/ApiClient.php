@@ -40,6 +40,36 @@ class ApiClient
     }
 
     /**
+     * Make an authenticated POST request.
+     *
+     * @throws ConnectionException
+     */
+    public function post(string $endpoint, array $data = []): Response
+    {
+        return $this->authenticated()->post($endpoint, $data);
+    }
+
+    /**
+     * Make an authenticated PUT request.
+     *
+     * @throws ConnectionException
+     */
+    public function put(string $endpoint, array $data = []): Response
+    {
+        return $this->authenticated()->put($endpoint, $data);
+    }
+
+    /**
+     * Make an authenticated DELETE request.
+     *
+     * @throws ConnectionException
+     */
+    public function delete(string $endpoint): Response
+    {
+        return $this->authenticated()->delete($endpoint);
+    }
+
+    /**
      * Create a base request to the API.
      */
     public function request(): PendingRequest

@@ -24,27 +24,30 @@
             <native:bottom-nav-item
                 id="home"
                 icon="home"
-                label="Home"
+                label="Inicio"
                 url="/"
-                :active="request()->routeIs('home')"
+                :active="request()->routeIs('home') || request()->routeIs('dashboard')"
             />
             <native:bottom-nav-item
-                id="account"
-                icon="person"
-                label="Account"
-                url="/account"
+                id="catalog"
+                icon="grid_view"
+                label="Catálogo"
+                url="/catalog"
+                :active="request()->routeIs('catalog')"
             />
             <native:bottom-nav-item
                 id="cart"
                 icon="shopping_cart"
-                label="Cart"
+                label="Carrito"
                 url="/cart"
+                :active="request()->routeIs('cart')"
             />
             <native:bottom-nav-item
-                id="menu"
-                icon="menu"
-                label="Menu"
-                url="/menu"
+                id="account"
+                icon="person"
+                label="Cuenta"
+                url="/account"
+                :active="request()->routeIs('account')"
             />
         </native:bottom-nav>
     </body>

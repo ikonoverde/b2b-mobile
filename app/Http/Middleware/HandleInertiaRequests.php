@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'cartItemCount' => fn () => $request->user()
+                ? rescue(fn () => count(app(CartService::class)->getCart()['data']['items'] ?? []), 0)
+                : 0,
         ];
     }
 }
