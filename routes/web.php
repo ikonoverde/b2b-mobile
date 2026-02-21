@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/items', [CartController::class, 'addItem'])->name('cart.addItem');
-    Route::put('/cart/items/{itemId}', [CartController::class, 'updateItem'])->name('cart.updateItem');
+    Route::post('/cart/items/{itemId}', [CartController::class, 'updateItem'])->name('cart.updateItem');
     Route::delete('/cart/items/{itemId}', [CartController::class, 'removeItem'])->name('cart.removeItem');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 

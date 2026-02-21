@@ -13,7 +13,7 @@ export function CartItemCard({ item }: CartItemCardProps) {
     const [updating, setUpdating] = useState(false);
 
     function updateQuantity(quantity: number) {
-        router.put(
+        router.post(
             `/cart/items/${item.id}`,
             { quantity },
             {
