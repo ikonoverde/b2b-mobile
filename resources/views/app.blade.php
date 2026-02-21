@@ -40,6 +40,7 @@
                 icon="shopping_cart"
                 label="Carrito"
                 url="/cart"
+                :badge="($page['props']['cartItemCount'] ?? 0) > 0 ? $page['props']['cartItemCount'] : ''"
                 :active="request()->routeIs('cart')"
             />
             <native:bottom-nav-item

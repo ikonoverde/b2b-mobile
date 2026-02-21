@@ -4,6 +4,12 @@ import { createRoot } from 'react-dom/client';
 import AppLayout from './layouts/AppLayout';
 import '../css/app.css';
 
+declare global {
+    interface Window {
+        router: typeof router;
+    }
+}
+
 // Expose Inertia router for NativePHP Edge components
 window.router = router;
 
@@ -27,5 +33,6 @@ createInertiaApp({
     },
     progress: {
         color: '#4B5563',
+        delay: 500,
     },
 });
