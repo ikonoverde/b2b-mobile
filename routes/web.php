@@ -16,10 +16,11 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
+
+    Route::get('/catalog', CatalogController::class)->name('catalog');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/catalog', CatalogController::class)->name('catalog');
     Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
     Route::post('/cart/items', [CartController::class, 'addItem'])->name('cart.addItem');
 });
