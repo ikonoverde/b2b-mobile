@@ -11,9 +11,12 @@ class OrderService
     /**
      * @throws ConnectionException
      */
-    public function getOrders(): array
+    public function getOrders(int $page = 1, int $perPage = 5): array
     {
-        return $this->apiClient->get('/orders')->json();
+        return $this->apiClient->get('/orders', [
+            'page' => $page,
+            'per_page' => $perPage,
+        ])->json();
     }
 
     /**

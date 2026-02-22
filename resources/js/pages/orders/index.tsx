@@ -1,12 +1,13 @@
-import { Head, Link } from '@inertiajs/react';
-import { ChevronDown, ClipboardList, MapPin, Package } from 'lucide-react';
+import { Head, InfiniteScroll, Link } from '@inertiajs/react';
+import { ChevronDown, ClipboardList, Loader2, MapPin, Package } from 'lucide-react';
 import { useState } from 'react';
 
 import { formatCurrency } from '@/lib/format';
-import type { Order } from '@/types/order';
+import type { Order, PaginatedOrders } from '@/types/order';
 
 interface OrdersProps {
-    orders: Order[];
+    orders: PaginatedOrders;
+    ordersTotal: number;
 }
 
 const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string }> = {
@@ -142,8 +143,8 @@ function OrderCard({ order }: { order: Order }) {
     );
 }
 
-export default function OrdersIndex({ orders }: OrdersProps) {
-    const isEmpty = orders.length === 0;
+export default function OrdersIndex({ orders, ordersTotal }: OrdersProps) {
+    const isEmpty = orders.data.length === 0;
 
     return (
         <>
@@ -153,7 +154,7 @@ export default function OrdersIndex({ orders }: OrdersProps) {
                 <h1 className="text-xl font-bold text-brand-green">Mis Pedidos</h1>
                 {!isEmpty && (
                     <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-green px-2 text-xs font-bold text-white">
-                        {orders.length}
+                        {ordersTotal}
                     </span>
                 )}
             </div>
@@ -185,11 +186,22 @@ export default function OrdersIndex({ orders }: OrdersProps) {
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3 px-6 pb-6">
-                    {orders.map((order) => (
-                        <OrderCard key={order.id} order={order} />
-                    ))}
-                </div>
+                <InfiniteScroll
+                    data="orders"
+                    preserveUrl
+                    onlyNext
+                    loading={
+                        <div className="flex justify-center py-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-brand-muted-green" />
+                        </div>
+                    }
+                >
+                    <div className="flex flex-col gap-3 px-6 pb-6">
+                        {orders.data.map((order) => (
+                            <OrderCard key={order.id} order={order} />
+                        ))}
+                    </div>
+                </InfiniteScroll>
             )}
         </>
     );

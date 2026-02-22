@@ -34,9 +34,9 @@ class ApiClient
      *
      * @throws ConnectionException
      */
-    public function get(string $endpoint): Response
+    public function get(string $endpoint, array $query = []): Response
     {
-        return $this->authenticated()->get($endpoint);
+        return $this->authenticated()->get($endpoint, $query);
     }
 
     /**
