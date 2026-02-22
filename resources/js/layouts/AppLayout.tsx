@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { UnauthHeader } from '@/components/home/UnauthHeader';
 import { usePage } from '@inertiajs/react';
+import { Agentation } from 'agentation';
 
 function updateBottomNav(cartItemCount: number) {
     const badge = cartItemCount > 0 ? String(cartItemCount) : null;
@@ -48,10 +49,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
     useBottomNavSync();
 
     return (
-        <div className="flex min-h-screen flex-col bg-brand-green">
-            <UnauthHeader />
+        <>
+            <div className="flex min-h-screen flex-col bg-brand-green">
+                <UnauthHeader />
 
-            <main className="flex flex-1 flex-col overflow-y-auto bg-brand-cream pb-6">{children}</main>
-        </div>
+                <main className="flex flex-1 flex-col overflow-y-auto bg-brand-cream pb-6">{children}</main>
+            </div>
+            <Agentation />
+        </>
     );
 }

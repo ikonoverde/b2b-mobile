@@ -1,36 +1,196 @@
 import { Head, Link } from '@inertiajs/react';
-import { ClipboardList } from 'lucide-react';
+import { ChevronDown, ClipboardList, MapPin, Package } from 'lucide-react';
+import { useState } from 'react';
 
-export default function OrdersIndex() {
+import { formatCurrency } from '@/lib/format';
+import type { Order } from '@/types/order';
+
+interface OrdersProps {
+    orders: Order[];
+}
+
+const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+    pending: { label: 'Pendiente', bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-400' },
+    processing: { label: 'En Proceso', bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-400' },
+    shipped: { label: 'Enviado', bg: 'bg-indigo-50', text: 'text-indigo-700', dot: 'bg-indigo-400' },
+    delivered: { label: 'Entregado', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400' },
+    cancelled: { label: 'Cancelado', bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-400' },
+    paid: { label: 'Pagado', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400' },
+};
+
+function getStatus(status: string) {
+    return statusConfig[status] ?? { label: status, bg: 'bg-gray-50', text: 'text-gray-700', dot: 'bg-gray-400' };
+}
+
+function formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('es-MX', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
+}
+
+function OrderCard({ order }: { order: Order }) {
+    const [expanded, setExpanded] = useState(false);
+    const status = getStatus(order.status);
+    const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = order.total_amount - order.shipping_cost;
+
+    return (
+        <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.06]">
+            {/* Card Header */}
+            <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex w-full items-center gap-3 p-4 text-left transition-colors active:bg-brand-cream"
+            >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-icon-bg-green">
+                    <Package className="h-5 w-5 text-brand-green" />
+                </div>
+
+                <div className="flex flex-1 flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-brand-green">Pedido #{order.id}</span>
+                        <span className="text-base font-bold text-brand-accent-brown">
+                            {formatCurrency(order.total_amount)}
+                        </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-brand-muted-text">{formatDate(order.created_at)}</span>
+                            <span className="text-xs text-brand-muted-text">&middot;</span>
+                            <span className="text-xs text-brand-muted-text">
+                                {itemCount} {itemCount === 1 ? 'producto' : 'productos'}
+                            </span>
+                        </div>
+                        <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${status.bg}`}>
+                            <div className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
+                            <span className={`text-[11px] font-semibold ${status.text}`}>{status.label}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-brand-muted-green transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+                />
+            </button>
+
+            {/* Expandable Details */}
+            <div
+                className={`grid transition-[grid-template-rows] duration-200 ease-out ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+            >
+                <div className="overflow-hidden">
+                    <div className="border-t border-black/[0.06] px-4 pb-4">
+                        {/* Items */}
+                        <div className="flex flex-col gap-2 pt-3">
+                            <span className="text-xs font-bold tracking-wide text-brand-green uppercase">
+                                Productos
+                            </span>
+                            {order.items.map((item) => (
+                                <div key={item.id} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="flex h-5 min-w-5 items-center justify-center rounded bg-brand-light-green text-[10px] font-bold text-brand-green">
+                                            {item.quantity}
+                                        </span>
+                                        <span className="text-sm text-brand-green">{item.product_name}</span>
+                                    </div>
+                                    <span className="text-sm font-medium text-brand-green">
+                                        {formatCurrency(item.subtotal)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Shipping Address */}
+                        {order.shipping_address && (
+                            <div className="mt-3 flex items-start gap-2.5 rounded-xl bg-brand-cream p-3">
+                                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-muted-green" />
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-semibold text-brand-green">
+                                        {order.shipping_address.street}
+                                    </span>
+                                    <span className="text-xs text-brand-muted-text">
+                                        {order.shipping_address.city}, {order.shipping_address.state}{' '}
+                                        {order.shipping_address.zip}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Totals */}
+                        <div className="mt-3 flex flex-col gap-1.5 border-t border-black/[0.06] pt-3">
+                            <div className="flex justify-between text-xs">
+                                <span className="text-brand-muted-text">Subtotal</span>
+                                <span className="font-medium text-brand-green">{formatCurrency(subtotal)}</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                                <span className="text-brand-muted-text">Envío</span>
+                                <span className="font-medium text-brand-green">
+                                    {formatCurrency(order.shipping_cost)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between border-t border-black/[0.06] pt-1.5">
+                                <span className="text-sm font-bold text-brand-green">Total</span>
+                                <span className="text-sm font-bold text-brand-accent-brown">
+                                    {formatCurrency(order.total_amount)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function OrdersIndex({ orders }: OrdersProps) {
+    const isEmpty = orders.length === 0;
+
     return (
         <>
             <Head title="Mis Pedidos" />
 
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                    <ClipboardList className="h-10 w-10 text-brand-green" />
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                    <h1 className="text-xl font-bold text-brand-green">Próximamente</h1>
-                    <p className="text-center text-sm text-brand-muted-text">
-                        El historial de pedidos estará disponible pronto.
-                    </p>
-                </div>
-                <div className="flex gap-3 pt-2">
-                    <Link
-                        href="/dashboard"
-                        className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-brand-green shadow-sm ring-1 ring-black/[0.06]"
-                    >
-                        Ir al Inicio
-                    </Link>
-                    <Link
-                        href="/catalog"
-                        className="rounded-xl bg-brand-green px-5 py-2.5 text-[13px] font-semibold text-white"
-                    >
-                        Ver Catálogo
-                    </Link>
-                </div>
+            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+                <h1 className="text-xl font-bold text-brand-green">Mis Pedidos</h1>
+                {!isEmpty && (
+                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-green px-2 text-xs font-bold text-white">
+                        {orders.length}
+                    </span>
+                )}
             </div>
+
+            {isEmpty ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-icon-bg-green">
+                        <ClipboardList className="h-10 w-10 text-brand-green" />
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                        <h2 className="text-xl font-bold text-brand-green">Sin pedidos aún</h2>
+                        <p className="text-center text-sm text-brand-muted-text">
+                            Cuando realices tu primer pedido, aparecerá aquí.
+                        </p>
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                        <Link
+                            href="/dashboard"
+                            className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-brand-green shadow-sm ring-1 ring-black/[0.06]"
+                        >
+                            Ir al Inicio
+                        </Link>
+                        <Link
+                            href="/catalog"
+                            className="rounded-xl bg-brand-green px-5 py-2.5 text-[13px] font-semibold text-white"
+                        >
+                            Ver Catálogo
+                        </Link>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-3 px-6 pb-6">
+                    {orders.map((order) => (
+                        <OrderCard key={order.id} order={order} />
+                    ))}
+                </div>
+            )}
         </>
     );
 }

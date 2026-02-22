@@ -26,3 +26,4 @@ yarn-error.log
 /.vscode
 /.zed
 /public/android-hot
+.playwright-mcp/

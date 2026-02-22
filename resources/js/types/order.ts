@@ -1,4 +1,5 @@
-export type ShippingAddress = {
+/** Used for the checkout shipping form submission. */
+export type ShippingFormData = {
     name: string;
     address_line_1: string;
     address_line_2?: string;
@@ -8,23 +9,39 @@ export type ShippingAddress = {
     phone: string;
 };
 
+/** Shipping address as returned by the API on orders. */
+export type ShippingAddress = {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+};
+
 export type OrderItem = {
     id: number;
     product_id: number;
-    name: string;
-    price: number;
+    product_name: string;
     quantity: number;
+    unit_price: number;
     subtotal: number;
+    image: string;
 };
 
 export type Order = {
     id: number;
     status: string;
-    items: OrderItem[];
+    payment_status: string;
+    total_amount: number;
+    shipping_cost: number;
     shipping_address: ShippingAddress;
-    subtotal: number;
-    shipping: number;
-    total: number;
+    items: OrderItem[];
     created_at: string;
     updated_at: string;
+};
+
+export type PaymentData = {
+    client_secret: string;
+    publishable_key: string;
+    order: Order | null;
 };
