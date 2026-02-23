@@ -122,6 +122,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Use appropriate PHP type hints for method parameters.
 
 <!-- Explicit Return Types and Method Params -->
+
 ```php
 protected function isAccessible(User $user, ?string $path = null): bool
 {
@@ -282,3 +283,17 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
 
 </laravel-boost-guidelines>
+
+## Code quality
+
+- Before committing, ALWAYS run auto-formatting with `qlty fmt`
+- Before finishing, ALWAYS run `qlty check --fix --level=low` and fix any lint errors
+- Before finishing, ALWAYS run `qlty smells` and fix any issues
+- Before finishing, ALWAYS run `qlty metrics --sort complexity --limit=5 app/`
+    - Max accepted cyclo: 10
+    - Max accepted cognitive/complex: 15
+    - Refactor anything above those limits to lower the complexity
+- Before finishing, ALWAYS run `qlty metrics --sort complexity --limit=5 resources/`
+    - Max accepted cyclo: 15
+    - Max accepted cognitive/complex: 20
+    - Refactor anything above those limits to lower the complexity

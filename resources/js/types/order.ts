@@ -43,9 +43,3 @@ export type Order = {
 export type PaginatedOrders = {
     data: Order[];
 };
-
-export type PaymentData = {
-    client_secret: string;
-    publishable_key: string;
-    order: Order | null;
-};

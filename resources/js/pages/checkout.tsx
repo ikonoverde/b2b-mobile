@@ -1,19 +1,18 @@
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { type Appearance, loadStripe, type Stripe } from '@stripe/stripe-js';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { CheckCircle, CreditCard, Loader2, MapPin, Package, Phone, Truck, User } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { CheckCircle, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Truck, User } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { TextInput } from '@/components/form/TextInput';
 import { formatCurrency } from '@/lib/format';
 import type { Cart } from '@/types/cart';
-import type { PaymentData } from '@/types/order';
+import type { Order } from '@/types/order';
 
 type Step = 'shipping' | 'payment' | 'success';
 
 interface CheckoutProps {
     cart: Cart;
-    paymentData?: PaymentData;
+    checkoutUrl?: string;
+    order?: Order;
 }
 
 const steps = [
@@ -22,20 +21,11 @@ const steps = [
     { key: 'success' as const, label: 'Listo', icon: CheckCircle },
 ];
 
-const stripeAppearance: Appearance = {
-    theme: 'stripe',
-    variables: {
-        colorPrimary: '#5E7052',
-        fontFamily: 'Nunito, system-ui, sans-serif',
-        borderRadius: '12px',
-    },
-};
-
 function StepIndicator({ currentStep }: { currentStep: Step }) {
     const currentIndex = steps.findIndex((s) => s.key === currentStep);
 
     return (
-        <div className="flex items-center justify-between px-6 pt-6 pb-2">
+        <div className="flex items-center justify-between px-6 pb-2 pt-6">
             {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isActive = index === currentIndex;
@@ -57,22 +47,14 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
                             </div>
                             <span
                                 className={`text-xs font-medium ${
-                                    isActive
-                                        ? 'text-brand-green'
-                                        : isCompleted
-                                          ? 'text-brand-green/70'
-                                          : 'text-gray-400'
+                                    isActive ? 'text-brand-green' : isCompleted ? 'text-brand-green/70' : 'text-gray-400'
                                 }`}
                             >
                                 {step.label}
                             </span>
                         </div>
                         {index < steps.length - 1 && (
-                            <div
-                                className={`mx-2 h-0.5 flex-1 rounded ${
-                                    isCompleted ? 'bg-brand-green/30' : 'bg-gray-100'
-                                }`}
-                            />
+                            <div className={`mx-2 h-0.5 flex-1 rounded ${isCompleted ? 'bg-brand-green/30' : 'bg-gray-100'}`} />
                         )}
                     </div>
                 );
@@ -84,30 +66,28 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 function OrderSummary({ cart }: { cart: Cart }) {
     return (
         <div className="mx-6 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
-            <h2 className="text-sm font-bold text-brand-green">Resumen ({cart.items.length} productos)</h2>
+            <h2 className="text-brand-green text-sm font-bold">Resumen ({cart.items.length} productos)</h2>
             <div className="flex flex-col gap-2">
                 {cart.items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                         <span className="text-brand-muted-text">
                             {item.name} x{item.quantity}
                         </span>
-                        <span className="font-medium text-brand-green">{formatCurrency(item.subtotal)}</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(item.subtotal)}</span>
                     </div>
                 ))}
                 <div className="border-t border-black/[0.06] pt-2">
                     <div className="flex justify-between text-sm">
                         <span className="text-brand-muted-text">Subtotal</span>
-                        <span className="font-medium text-brand-green">{formatCurrency(cart.totals.subtotal)}</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(cart.totals.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-brand-muted-text">Envio</span>
-                        <span className="font-medium text-brand-green">{formatCurrency(cart.totals.shipping)}</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(cart.totals.shipping)}</span>
                     </div>
                     <div className="mt-1 flex justify-between">
-                        <span className="text-sm font-bold text-brand-green">Total</span>
-                        <span className="text-base font-bold text-brand-accent-brown">
-                            {formatCurrency(cart.totals.total)}
-                        </span>
+                        <span className="text-brand-green text-sm font-bold">Total</span>
+                        <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(cart.totals.total)}</span>
                     </div>
                 </div>
             </div>
@@ -115,106 +95,75 @@ function OrderSummary({ cart }: { cart: Cart }) {
     );
 }
 
-function PaymentForm({ orderId, onSuccess }: { orderId: number | null; onSuccess: () => void }) {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [processing, setProcessing] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+function PaymentPending({ checkoutUrl, onPaid }: { checkoutUrl: string; onPaid: () => void }) {
+    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-
-        if (!stripe || !elements) {
-            return;
-        }
-
-        setProcessing(true);
-        setError(null);
-
-        const result = await stripe.confirmPayment({
-            elements,
-            redirect: 'if_required',
-        });
-
-        if (result.error) {
-            setError(result.error.message ?? 'Error al procesar el pago.');
-            setProcessing(false);
-            return;
-        }
-
-        // Payment succeeded — confirm with our backend
-        const paymentIntentId = result.paymentIntent?.id;
-        if (!paymentIntentId) {
-            setError('No se recibio confirmacion del pago.');
-            setProcessing(false);
-            return;
-        }
-
+    const pollStatus = useCallback(async () => {
         try {
-            const xsrfToken = document.cookie
-                .split('; ')
-                .find((c) => c.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
-
-            const response = await fetch('/checkout/confirm', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    ...(xsrfToken ? { 'X-XSRF-TOKEN': decodeURIComponent(xsrfToken) } : {}),
-                },
-                body: JSON.stringify({ order_id: orderId, payment_intent_id: paymentIntentId }),
+            const response = await fetch('/checkout/status', {
+                headers: { Accept: 'application/json' },
             });
 
-            if (!response.ok) {
-                const data = await response.json();
-                setError(data.error ?? 'No se pudo confirmar el pago.');
-                setProcessing(false);
-                return;
-            }
+            if (!response.ok) return;
 
-            onSuccess();
+            const data = await response.json();
+
+            if (data.status === 'paid') {
+                if (pollingRef.current) {
+                    clearInterval(pollingRef.current);
+                    pollingRef.current = null;
+                }
+                onPaid();
+            }
         } catch {
-            setError('Error de conexion. Intenta de nuevo.');
-            setProcessing(false);
+            // Silently retry on network errors
         }
-    }
+    }, [onPaid]);
+
+    useEffect(() => {
+        pollingRef.current = setInterval(pollStatus, 3000);
+
+        return () => {
+            if (pollingRef.current) {
+                clearInterval(pollingRef.current);
+            }
+        };
+    }, [pollStatus]);
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 pt-5 pb-6">
-            <h2 className="text-sm font-bold text-brand-green">Informacion de Pago</h2>
+        <div className="flex flex-col gap-4 px-6 pb-6 pt-5">
+            <h2 className="text-brand-green text-sm font-bold">Pago</h2>
 
-            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
-                <PaymentElement />
-            </div>
-
-            {error && <p className="text-sm font-medium text-red-500">{error}</p>}
-
-            <button
-                type="submit"
-                disabled={processing || !stripe || !elements}
-                className="flex h-14 items-center justify-center rounded-2xl bg-brand-green font-bold text-white disabled:opacity-70"
+            <a
+                href={checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-brand-green flex h-14 items-center justify-center gap-2 rounded-2xl font-bold text-white"
             >
-                {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Pagar Ahora'}
-            </button>
-        </form>
+                <ExternalLink className="h-5 w-5" />
+                Pagar con Stripe
+            </a>
+
+            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/[0.06]">
+                <Loader2 className="text-brand-green h-8 w-8 animate-spin" />
+                <p className="text-brand-muted-text text-center text-sm">Esperando confirmacion de pago...</p>
+                <p className="text-brand-muted-text/70 text-center text-xs">
+                    Completa el pago en tu navegador. Esta pagina se actualizara automaticamente.
+                </p>
+            </div>
+        </div>
     );
 }
 
 function SuccessStep() {
     return (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-green/10">
-                <CheckCircle className="h-10 w-10 text-brand-green" />
+            <div className="bg-brand-green/10 flex h-20 w-20 items-center justify-center rounded-full">
+                <CheckCircle className="text-brand-green h-10 w-10" />
             </div>
-            <h2 className="text-xl font-bold text-brand-green">Pago Exitoso</h2>
-            <p className="text-center text-sm text-brand-muted-text">
-                Tu pedido ha sido confirmado. Puedes seguir el estado en tus pedidos.
-            </p>
-            <a
-                href="/orders"
-                className="mt-4 flex h-14 w-full items-center justify-center rounded-2xl bg-brand-green font-bold text-white"
-            >
+            <h2 className="text-brand-green text-xl font-bold">Pago Exitoso</h2>
+            <p className="text-brand-muted-text text-center text-sm">Tu pedido ha sido confirmado. Puedes seguir el estado en tus pedidos.</p>
+            <a href="/orders" className="bg-brand-green mt-4 flex h-14 w-full items-center justify-center rounded-2xl font-bold text-white">
                 <Package className="mr-2 h-5 w-5" />
                 Ver Mis Pedidos
             </a>
@@ -222,10 +171,8 @@ function SuccessStep() {
     );
 }
 
-export default function Checkout({ cart, paymentData }: CheckoutProps) {
+export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
     const [step, setStep] = useState<Step>('shipping');
-    const stripePromise = useRef<Promise<Stripe | null> | null>(null);
-    const [stripeLoaded, setStripeLoaded] = useState<Promise<Stripe | null> | null>(null);
 
     const form = useForm({
         name: '',
@@ -239,21 +186,13 @@ export default function Checkout({ cart, paymentData }: CheckoutProps) {
 
     const pageErrors = usePage().props.errors as Record<string, string>;
 
-    // When paymentData arrives from the server, transition to payment step
     useEffect(() => {
-        if (paymentData) {
-            console.log('[Checkout] paymentData received:', JSON.stringify(paymentData));
-        }
-        if (paymentData?.client_secret && paymentData?.publishable_key) {
-            if (!stripePromise.current) {
-                stripePromise.current = loadStripe(paymentData.publishable_key);
-            }
-            setStripeLoaded(stripePromise.current);
+        if (checkoutUrl) {
             setStep('payment');
         }
-    }, [paymentData]);
+    }, [checkoutUrl]);
 
-    function submitShipping(e: React.FormEvent) {
+    function submitShipping(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         form.post('/checkout');
     }
@@ -267,8 +206,8 @@ export default function Checkout({ cart, paymentData }: CheckoutProps) {
             {step !== 'success' && <OrderSummary cart={cart} />}
 
             {step === 'shipping' && (
-                <form onSubmit={submitShipping} className="flex flex-col gap-3.5 px-6 pt-5 pb-6">
-                    <h2 className="text-sm font-bold text-brand-green">Direccion de Envio</h2>
+                <form onSubmit={submitShipping} className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
+                    <h2 className="text-brand-green text-sm font-bold">Direccion de Envio</h2>
 
                     <TextInput
                         label="Nombre de contacto"
@@ -340,32 +279,19 @@ export default function Checkout({ cart, paymentData }: CheckoutProps) {
                         />
                     </div>
 
-                    {pageErrors.checkout && (
-                        <p className="text-sm font-medium text-red-500">{pageErrors.checkout}</p>
-                    )}
+                    {pageErrors.checkout && <p className="text-sm font-medium text-red-500">{pageErrors.checkout}</p>}
 
                     <button
                         type="submit"
                         disabled={form.processing}
-                        className="flex h-14 items-center justify-center rounded-2xl bg-brand-green font-bold text-white disabled:opacity-70"
+                        className="bg-brand-green flex h-14 items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
                     >
                         {form.processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continuar al Pago'}
                     </button>
                 </form>
             )}
 
-            {step === 'payment' && stripeLoaded && paymentData?.client_secret && (
-                <Elements
-                    stripe={stripeLoaded}
-                    options={{
-                        clientSecret: paymentData.client_secret,
-                        appearance: stripeAppearance,
-                        locale: 'es',
-                    }}
-                >
-                    <PaymentForm orderId={paymentData.order?.id ?? null} onSuccess={() => setStep('success')} />
-                </Elements>
-            )}
+            {step === 'payment' && checkoutUrl && <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />}
 
             {step === 'success' && <SuccessStep />}
         </>

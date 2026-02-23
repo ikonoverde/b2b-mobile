@@ -20,8 +20,8 @@ class CheckoutService
     /**
      * @throws ConnectionException
      */
-    public function confirmPayment(array $data): Response
+    public function verifySession(string $sessionId): Response
     {
-        return $this->apiClient->post('/checkout/confirm', $data);
+        return $this->apiClient->get('/checkout/verify', ['session_id' => $sessionId]);
     }
 }
