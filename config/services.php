@@ -37,5 +37,6 @@ return [
 
     'api' => [
         'url' => env('API_URL'),
+        'base_url' => env('API_BASE_URL', rtrim(preg_replace('#/api$#', '', env('API_URL', '')), '/')),
     ],
 ];

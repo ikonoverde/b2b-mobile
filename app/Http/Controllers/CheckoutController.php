@@ -7,8 +7,7 @@ use App\Services\CartService;
 use App\Services\CheckoutService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,6 +41,8 @@ class CheckoutController extends Controller
     {
         $validated = $request->validated();
 
+        $apiBaseUrl = config('services.api.base_url');
+
         $response = $this->checkoutService->createOrder([
             'shipping_address' => [
                 'street' => $validated['address_line_1'],
@@ -50,9 +51,9 @@ class CheckoutController extends Controller
                 'zip' => $validated['postal_code'],
                 'country' => 'MX',
             ],
-            'success_url' => url('/checkout/success').
-                '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => url('/checkout/cancel'),
+            'success_url' => $apiBaseUrl.
+                '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $apiBaseUrl.'/checkout/cancel',
         ]);
 
         $emptyCart = [
@@ -68,12 +69,14 @@ class CheckoutController extends Controller
         }
 
         $body = $response->json();
+        Log::info('Checkout API response', ['body' => $body]);
         $order = $body['data'] ?? null;
         $checkoutUrl = $body['checkout_url'] ?? '';
-        $sessionId = $body['session_id'] ?? '';
 
-        if ($order) {
-            session(['checkout_order_id' => $order['id']]);
+        // Extract Stripe session ID from checkout URL
+        $sessionId = '';
+        if (preg_match('/cs_(test|live)_[a-zA-Z0-9]+/', $checkoutUrl, $matches)) {
+            $sessionId = $matches[0];
         }
 
         if ($sessionId) {
@@ -90,16 +93,13 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Poll endpoint to check payment status.
+     * Proxy to API's checkout verify endpoint (requires auth token).
      *
      * @throws ConnectionException
      */
-    public function status(Request $request): JsonResponse
+    public function status(): JsonResponse
     {
-        $sessionId = $request->query(
-            'session_id',
-            session('checkout_session_id', ''),
-        );
+        $sessionId = session('checkout_session_id', '');
 
         if (! $sessionId) {
             return response()->json([
@@ -115,35 +115,5 @@ class CheckoutController extends Controller
         }
 
         return response()->json($response->json());
-    }
-
-    /**
-     * Browser redirect target after successful Stripe payment.
-     */
-    public function success(Request $request): View
-    {
-        $sessionId = $request->query('session_id', '');
-
-        if ($sessionId) {
-            session(['checkout_session_id' => $sessionId]);
-        }
-
-        return view('checkout-return', [
-            'status' => 'success',
-            'message' => 'Pago exitoso',
-            'description' => 'Puedes volver a la app para ver tu pedido.',
-        ]);
-    }
-
-    /**
-     * Browser redirect target when user cancels Stripe payment.
-     */
-    public function cancel(): View
-    {
-        return view('checkout-return', [
-            'status' => 'cancel',
-            'message' => 'Pago cancelado',
-            'description' => 'Vuelve a la app para intentar de nuevo.',
-        ]);
     }
 }

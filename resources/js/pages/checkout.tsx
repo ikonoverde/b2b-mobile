@@ -136,8 +136,6 @@ function PaymentPending({ checkoutUrl, onPaid }: { checkoutUrl: string; onPaid: 
 
             <a
                 href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="bg-brand-green flex h-14 items-center justify-center gap-2 rounded-2xl font-bold text-white"
             >
                 <ExternalLink className="h-5 w-5" />
@@ -291,7 +289,9 @@ export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
                 </form>
             )}
 
-            {step === 'payment' && checkoutUrl && <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />}
+            {step === 'payment' && checkoutUrl && (
+                <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />
+            )}
 
             {step === 'success' && <SuccessStep />}
         </>
