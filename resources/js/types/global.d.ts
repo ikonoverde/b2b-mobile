@@ -14,6 +14,7 @@ declare module '@inertiajs/core' {
             auth: Auth;
             cartItemCount: number;
             sidebarOpen: boolean;
+            flash: { status: string | null };
             [key: string]: unknown;
         };
     }

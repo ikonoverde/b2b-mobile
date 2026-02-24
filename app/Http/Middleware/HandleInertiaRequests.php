@@ -42,6 +42,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'flash' => [
+                'status' => fn () => $request->session()->get('status'),
+            ],
             'cartItemCount' => fn () => $request->user()
                 ? rescue(fn () => count(app(CartService::class)->getCart()['data']['items'] ?? []), 0)
                 : 0,

@@ -70,6 +70,16 @@ class ApiClient
     }
 
     /**
+     * Send a forgot password request.
+     *
+     * @throws ConnectionException
+     */
+    public function forgotPassword(array $data): Response
+    {
+        return $this->request()->post('/forgot-password', $data);
+    }
+
+    /**
      * Create a base request to the API.
      */
     public function request(): PendingRequest
