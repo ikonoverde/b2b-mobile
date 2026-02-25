@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Check, CheckCircle, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Plus, Truck, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -406,7 +406,15 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
                 </form>
             )}
 
-            {step === 'payment' && checkoutUrl && <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />}
+            {step === 'payment' && checkoutUrl && (
+                <PaymentPending
+                    checkoutUrl={checkoutUrl}
+                    onPaid={() => {
+                        setStep('success');
+                        router.reload({ only: ['cartItemCount'] });
+                    }}
+                />
+            )}
 
             {step === 'success' && <SuccessStep />}
         </>
