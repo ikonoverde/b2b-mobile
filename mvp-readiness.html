@@ -737,8 +737,8 @@ const modules = [
     name: 'Legal & Compliance',
     icon: 'doc',
     features: [
-      { id: 'terms', name: 'Terms & Conditions', status: 'missing', priority: 'p0', effort: 'small', note: 'Linked from registration but page does not exist' },
-      { id: 'privacy', name: 'Privacy Policy', status: 'missing', priority: 'p0', effort: 'small', note: 'Linked from registration but page does not exist' },
+      { id: 'terms', name: 'Terms & Conditions', status: 'done', note: 'Spanish legal content with 9 sections, SPA navigation from register page', files: ['app/Http/Controllers/TermsController.php', 'resources/js/pages/terms.tsx'] },
+      { id: 'privacy', name: 'Privacy Policy', status: 'done', note: 'Spanish legal content with ARCO rights, SPA navigation from register page', files: ['app/Http/Controllers/PrivacyController.php', 'resources/js/pages/privacy.tsx'] },
     ]
   },
   {
@@ -999,6 +999,8 @@ function renderStackView(container) {
         { name: 'Account', path: 'resources/js/pages/account.tsx', desc: 'Profile display with stub menus' },
         { name: 'Login', path: 'resources/js/pages/auth/login.tsx', desc: 'Email + password form' },
         { name: 'Register', path: 'resources/js/pages/auth/register.tsx', desc: 'Business registration with RFC' },
+        { name: 'Terms', path: 'resources/js/pages/terms.tsx', desc: 'Terms & Conditions (Spanish)' },
+        { name: 'Privacy', path: 'resources/js/pages/privacy.tsx', desc: 'Privacy Policy (Spanish)' },
       ]
     },
     {
@@ -1013,6 +1015,8 @@ function renderStackView(container) {
         { name: 'CheckoutController', path: 'app/Http/Controllers/CheckoutController.php', desc: 'create, store, status (Stripe proxy)' },
         { name: 'OrderController', path: 'app/Http/Controllers/OrderController.php', desc: 'index - paginated orders' },
         { name: 'AccountController', path: 'app/Http/Controllers/AccountController.php', desc: 'Invokable - profile display' },
+        { name: 'TermsController', path: 'app/Http/Controllers/TermsController.php', desc: 'Invokable - terms page' },
+        { name: 'PrivacyController', path: 'app/Http/Controllers/PrivacyController.php', desc: 'Invokable - privacy page' },
       ]
     },
     {
@@ -1111,12 +1115,11 @@ ${modules.filter(m => {
 
 RECOMMENDED NEXT STEPS (ordered by priority and effort):
 1. Add error handling/boundaries (P0, medium) - app crashes on API failures
-2. Create Terms & Privacy pages (P0, small) - linked but missing
-3. Add offline/error state handling (P1, medium) - mobile app needs this
-4. Add profile editing (P1, medium) - users can't update their info
-5. Complete saved addresses (P1, large) - frontend built, awaiting API endpoints (API-6)
-6. Add billing info management (P1, large) - B2B customers need invoicing
-7. Write feature tests (P1, large) - only 2 example tests exist`;
+2. Add offline/error state handling (P1, medium) - mobile app needs this
+3. Add profile editing (P1, medium) - users can't update their info
+4. Complete saved addresses (P1, large) - frontend built, awaiting API endpoints (API-6)
+5. Add billing info management (P1, large) - B2B customers need invoicing
+6. Write feature tests (P1, large) - only 2 example tests exist`;
 
   document.getElementById('promptOutput').textContent = prompt;
 }

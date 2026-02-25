@@ -29,8 +29,8 @@ export default function Register() {
 
     return (
         <div className="mx-auto w-full max-w-md px-6 py-6">
-            <h1 className="text-2xl font-bold text-brand-green">Crear Cuenta</h1>
-            <p className="mt-1 text-sm text-brand-muted-green">Completa los datos de tu negocio</p>
+            <h1 className="text-brand-green text-2xl font-bold">Crear Cuenta</h1>
+            <p className="text-brand-muted-green mt-1 text-sm">Completa los datos de tu negocio</p>
 
             <form onSubmit={submit} className="mt-6 flex flex-col gap-3.5">
                 <TextInput
@@ -89,12 +89,7 @@ export default function Register() {
                     disabled={form.processing}
                     error={form.errors.password}
                     rightElement={
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="text-brand-muted-green"
-                            tabIndex={-1}
-                        >
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-brand-muted-green" tabIndex={-1}>
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     }
@@ -107,26 +102,26 @@ export default function Register() {
                     error={form.errors.terms_accepted}
                 >
                     Acepto los{' '}
-                    <a href="/terms" className="font-semibold text-brand-accent-brown">
+                    <Link href="/terms" className="text-brand-accent-brown font-semibold">
                         Términos y Condiciones
-                    </a>{' '}
+                    </Link>{' '}
                     y la{' '}
-                    <a href="/privacy" className="font-semibold text-brand-accent-brown">
+                    <Link href="/privacy" className="text-brand-accent-brown font-semibold">
                         Política de Privacidad
-                    </a>
+                    </Link>
                 </Checkbox>
 
                 <button
                     type="submit"
                     disabled={form.processing}
-                    className="flex h-14 items-center justify-center rounded-2xl bg-brand-green font-bold text-white disabled:opacity-70"
+                    className="bg-brand-green flex h-14 items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
                 >
                     {form.processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Crear Cuenta'}
                 </button>
 
-                <p className="py-4 text-center text-sm text-brand-muted-green">
+                <p className="text-brand-muted-green py-4 text-center text-sm">
                     ¿Ya tienes cuenta?{' '}
-                    <Link href="/login" className="font-bold text-brand-accent-brown">
+                    <Link href="/login" className="text-brand-accent-brown font-bold">
                         Inicia sesión
                     </Link>
                 </p>

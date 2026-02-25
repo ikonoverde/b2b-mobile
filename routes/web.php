@@ -12,11 +12,15 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TermsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/catalog', CatalogController::class)->name('catalog');
+Route::get('/terms', TermsController::class)->name('terms');
+Route::get('/privacy', PrivacyController::class)->name('privacy');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
