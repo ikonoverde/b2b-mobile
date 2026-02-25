@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -47,4 +48,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/account', AccountController::class)->name('account');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+
+    Route::get('/account/addresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::post('/account/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/account/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/account/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 });

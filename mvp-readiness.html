@@ -679,7 +679,7 @@ const modules = [
       { id: 'shipping-form', name: 'Shipping Address Form', status: 'done', note: '3-step wizard with validation', files: ['resources/js/pages/checkout.tsx'] },
       { id: 'stripe-payment', name: 'Stripe Payment', status: 'done', note: 'Hosted Checkout Sessions with polling', files: ['app/Http/Controllers/CheckoutController.php', 'app/Services/CheckoutService.php'] },
       { id: 'success-confirm', name: 'Success Confirmation', status: 'done', note: 'Animated success step with link to orders', files: ['resources/js/pages/checkout.tsx'] },
-      { id: 'saved-addresses', name: 'Saved Addresses', status: 'missing', priority: 'p1', effort: 'large', note: 'No address book, manual entry every time' },
+      { id: 'saved-addresses', name: 'Saved Addresses', status: 'partial', priority: 'p1', effort: 'large', note: 'Frontend CRUD built, awaiting API endpoints (API-6)', files: ['app/Http/Controllers/AddressController.php', 'app/Services/AddressService.php', 'resources/js/pages/account/addresses.tsx'] },
       { id: 'order-notes', name: 'Order Notes', status: 'missing', priority: 'p3', effort: 'small', note: 'No field for delivery instructions' },
     ]
   },
@@ -1114,7 +1114,7 @@ RECOMMENDED NEXT STEPS (ordered by priority and effort):
 2. Create Terms & Privacy pages (P0, small) - linked but missing
 3. Add offline/error state handling (P1, medium) - mobile app needs this
 4. Add profile editing (P1, medium) - users can't update their info
-5. Build saved addresses (P1, large) - repeat buyers need this
+5. Complete saved addresses (P1, large) - frontend built, awaiting API endpoints (API-6)
 6. Add billing info management (P1, large) - B2B customers need invoicing
 7. Write feature tests (P1, large) - only 2 example tests exist`;
 
