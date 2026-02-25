@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 
 class UserService
 {
@@ -14,5 +15,13 @@ class UserService
     public function getProfile(): array
     {
         return $this->apiClient->get('/user')->json();
+    }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function updateProfile(array $data): Response
+    {
+        return $this->apiClient->put('/user', $data);
     }
 }

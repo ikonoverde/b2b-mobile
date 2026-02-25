@@ -14,6 +14,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TermsController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/account', AccountController::class)->name('account');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+
+    Route::get('/account/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/account/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/account/addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('/account/addresses', [AddressController::class, 'store'])->name('addresses.store');
