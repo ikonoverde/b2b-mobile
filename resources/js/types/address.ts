@@ -9,4 +9,7 @@ export interface Address {
     postal_code: string;
     phone: string;
     is_default: boolean;
+    country: string;
+    created_at: string;
+    updated_at: string;
 }
