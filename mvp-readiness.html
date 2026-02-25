@@ -639,7 +639,7 @@ const modules = [
       { id: 'login', name: 'Login', status: 'done', note: 'Auth::attempt delegates to ApiUserProvider which calls API /login and stores token', files: ['app/Http/Controllers/Auth/LoginController.php', 'app/Auth/ApiUserProvider.php', 'resources/js/pages/auth/login.tsx'] },
       { id: 'register', name: 'Registration', status: 'done', note: 'Full flow with RFC, phone, terms', files: ['app/Http/Controllers/Auth/RegisterController.php', 'resources/js/pages/auth/register.tsx'] },
       { id: 'logout', name: 'Logout', status: 'done', note: 'POST /logout with session destroy', files: ['app/Http/Controllers/Auth/LogoutController.php'] },
-      { id: 'forgot-password', name: 'Forgot Password', status: 'missing', priority: 'p0', effort: 'medium', note: 'No password reset flow exists' },
+      { id: 'forgot-password', name: 'Forgot Password', status: 'done', note: 'Email form posts to API /forgot-password, success/error states, linked from login', files: ['app/Http/Controllers/Auth/ForgotPasswordController.php', 'app/Http/Requests/Auth/ForgotPasswordRequest.php', 'resources/js/pages/auth/forgot-password.tsx', 'app/Services/ApiClient.php'] },
       { id: 'email-verify', name: 'Email Verification', status: 'missing', priority: 'p2', effort: 'medium', note: 'MustVerifyEmail is commented out on User model' },
       { id: 'session-mgmt', name: 'Session/Token Sync', status: 'done', note: 'Both login (via ApiUserProvider) and register store api_token in session', files: ['app/Auth/ApiUserProvider.php', 'app/Http/Controllers/Auth/RegisterController.php'] },
     ]
@@ -1112,12 +1112,11 @@ ${modules.filter(m => {
 RECOMMENDED NEXT STEPS (ordered by priority and effort):
 1. Add error handling/boundaries (P0, medium) - app crashes on API failures
 2. Create Terms & Privacy pages (P0, small) - linked but missing
-3. Add forgot/reset password flow (P0, medium) - essential for any app
-4. Add offline/error state handling (P1, medium) - mobile app needs this
-5. Add profile editing (P1, medium) - users can't update their info
-6. Build saved addresses (P1, large) - repeat buyers need this
-7. Add billing info management (P1, large) - B2B customers need invoicing
-8. Write feature tests (P1, large) - only 2 example tests exist`;
+3. Add offline/error state handling (P1, medium) - mobile app needs this
+4. Add profile editing (P1, medium) - users can't update their info
+5. Build saved addresses (P1, large) - repeat buyers need this
+6. Add billing info management (P1, large) - B2B customers need invoicing
+7. Write feature tests (P1, large) - only 2 example tests exist`;
 
   document.getElementById('promptOutput').textContent = prompt;
 }
