@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
+use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CheckoutService;
 use Illuminate\Http\Client\ConnectionException;
@@ -14,6 +15,7 @@ use Inertia\Response;
 class CheckoutController extends Controller
 {
     public function __construct(
+        private readonly AddressService $addressService,
         private readonly CartService $cartService,
         private readonly CheckoutService $checkoutService,
     ) {}
@@ -27,8 +29,15 @@ class CheckoutController extends Controller
     {
         $cart = $this->cartService->getCart();
 
+        try {
+            $savedAddresses = $this->addressService->getAddresses()['data'] ?? [];
+        } catch (ConnectionException) {
+            $savedAddresses = [];
+        }
+
         return Inertia::render('checkout', [
             'cart' => $cart['data'] ?? ['items' => [], 'totals' => ['subtotal' => 0, 'shipping' => 0, 'total' => 0]],
+            'savedAddresses' => $savedAddresses,
         ]);
     }
 
@@ -64,6 +73,7 @@ class CheckoutController extends Controller
         if (! $response->successful()) {
             return Inertia::render('checkout', [
                 'cart' => $this->cartService->getCart()['data'] ?? $emptyCart,
+                'savedAddresses' => [],
                 'errors' => ['checkout' => 'No se pudo procesar el pedido. Intenta de nuevo.'],
             ]);
         }
@@ -87,6 +97,7 @@ class CheckoutController extends Controller
 
         return Inertia::render('checkout', [
             'cart' => $cart['data'] ?? $emptyCart,
+            'savedAddresses' => [],
             'checkoutUrl' => $checkoutUrl,
             'order' => $order,
         ]);

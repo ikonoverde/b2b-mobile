@@ -3,19 +3,7 @@ import { ArrowLeft, Building2, Check, Hash, Loader2, Map, MapPin, Pencil, Phone,
 import { useState } from 'react';
 
 import { TextInput } from '@/components/form/TextInput';
-
-interface Address {
-    id: number;
-    label: string;
-    name: string;
-    address_line_1: string;
-    address_line_2: string | null;
-    city: string;
-    state: string;
-    postal_code: string;
-    phone: string;
-    is_default: boolean;
-}
+import type { Address } from '@/types';
 
 interface AddressesProps {
     addresses: Address[];

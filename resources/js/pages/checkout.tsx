@@ -1,9 +1,10 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { CheckCircle, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Truck, User } from 'lucide-react';
+import { Check, CheckCircle, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Plus, Truck, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { TextInput } from '@/components/form/TextInput';
 import { formatCurrency } from '@/lib/format';
+import type { Address } from '@/types';
 import type { Cart } from '@/types/cart';
 import type { Order } from '@/types/order';
 
@@ -11,6 +12,7 @@ type Step = 'shipping' | 'payment' | 'success';
 
 interface CheckoutProps {
     cart: Cart;
+    savedAddresses?: Address[];
     checkoutUrl?: string;
     order?: Order;
 }
@@ -95,6 +97,84 @@ function OrderSummary({ cart }: { cart: Cart }) {
     );
 }
 
+function formatAddress(address: Address): string {
+    const parts = [address.address_line_1];
+
+    if (address.address_line_2) {
+        parts.push(address.address_line_2);
+    }
+
+    parts.push(`${address.city}, ${address.state} ${address.postal_code}`);
+
+    return parts.join(', ');
+}
+
+function SavedAddressPicker({
+    addresses,
+    selectedId,
+    onSelect,
+}: {
+    addresses: Address[];
+    selectedId: number | 'new' | null;
+    onSelect: (id: number | 'new') => void;
+}) {
+    return (
+        <div className="flex flex-col gap-2.5">
+            {addresses.map((address) => {
+                const isSelected = selectedId === address.id;
+
+                return (
+                    <button
+                        key={address.id}
+                        type="button"
+                        onClick={() => onSelect(address.id)}
+                        className={`flex items-start gap-3 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 transition-colors ${
+                            isSelected ? 'ring-brand-green ring-2' : 'ring-black/[0.06] active:bg-gray-50'
+                        }`}
+                    >
+                        <div
+                            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                                isSelected ? 'border-brand-green bg-brand-green' : 'border-gray-300'
+                            }`}
+                        >
+                            {isSelected && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <div className="flex items-center gap-2">
+                                <span className="text-brand-green text-sm font-bold">{address.label}</span>
+                                {address.is_default && (
+                                    <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                                        Predeterminada
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-brand-green text-sm font-medium">{address.name}</span>
+                            <span className="text-brand-muted-text text-[13px] leading-relaxed">{formatAddress(address)}</span>
+                            <div className="flex items-center gap-1.5 pt-0.5">
+                                <Phone className="text-brand-muted-green h-3.5 w-3.5" />
+                                <span className="text-brand-muted-text text-[13px]">{address.phone}</span>
+                            </div>
+                        </div>
+                    </button>
+                );
+            })}
+
+            <button
+                type="button"
+                onClick={() => onSelect('new')}
+                className={`flex items-center gap-3 rounded-2xl border-2 border-dashed p-4 text-sm font-semibold transition-colors ${
+                    selectedId === 'new'
+                        ? 'border-brand-green bg-brand-green/5 text-brand-green'
+                        : 'text-brand-muted-text border-gray-200 active:bg-gray-50'
+                }`}
+            >
+                <Plus className="h-4 w-4" />
+                Ingresar nueva direccion
+            </button>
+        </div>
+    );
+}
+
 function PaymentPending({ checkoutUrl, onPaid }: { checkoutUrl: string; onPaid: () => void }) {
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -134,10 +214,7 @@ function PaymentPending({ checkoutUrl, onPaid }: { checkoutUrl: string; onPaid: 
         <div className="flex flex-col gap-4 px-6 pb-6 pt-5">
             <h2 className="text-brand-green text-sm font-bold">Pago</h2>
 
-            <a
-                href={checkoutUrl}
-                className="bg-brand-green flex h-14 items-center justify-center gap-2 rounded-2xl font-bold text-white"
-            >
+            <a href={checkoutUrl} className="bg-brand-green flex h-14 items-center justify-center gap-2 rounded-2xl font-bold text-white">
                 <ExternalLink className="h-5 w-5" />
                 Pagar con Stripe
             </a>
@@ -169,8 +246,11 @@ function SuccessStep() {
     );
 }
 
-export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
+export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: CheckoutProps) {
     const [step, setStep] = useState<Step>('shipping');
+    const hasAddresses = savedAddresses.length > 0;
+    const defaultAddress = savedAddresses.find((a) => a.is_default);
+    const [selectedAddressId, setSelectedAddressId] = useState<number | 'new' | null>(defaultAddress?.id ?? (hasAddresses ? null : 'new'));
 
     const form = useForm({
         name: '',
@@ -190,6 +270,37 @@ export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
         }
     }, [checkoutUrl]);
 
+    useEffect(() => {
+        if (typeof selectedAddressId === 'number') {
+            const address = savedAddresses.find((a) => a.id === selectedAddressId);
+
+            if (address) {
+                form.setData({
+                    name: address.name,
+                    address_line_1: address.address_line_1,
+                    address_line_2: address.address_line_2 ?? '',
+                    city: address.city,
+                    state: address.state,
+                    postal_code: address.postal_code,
+                    phone: address.phone,
+                });
+            }
+        } else if (selectedAddressId === 'new') {
+            form.setData({
+                name: '',
+                address_line_1: '',
+                address_line_2: '',
+                city: '',
+                state: '',
+                postal_code: '',
+                phone: '',
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedAddressId]);
+
+    const showManualForm = selectedAddressId === 'new' || !hasAddresses;
+
     function submitShipping(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         form.post('/checkout');
@@ -207,81 +318,87 @@ export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
                 <form onSubmit={submitShipping} className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
                     <h2 className="text-brand-green text-sm font-bold">Direccion de Envio</h2>
 
-                    <TextInput
-                        label="Nombre de contacto"
-                        icon={User}
-                        placeholder="Nombre completo"
-                        value={form.data.name}
-                        onChange={(e) => form.setData('name', e.target.value)}
-                        disabled={form.processing}
-                        error={form.errors.name}
-                    />
+                    {hasAddresses && <SavedAddressPicker addresses={savedAddresses} selectedId={selectedAddressId} onSelect={setSelectedAddressId} />}
 
-                    <TextInput
-                        label="Direccion"
-                        icon={MapPin}
-                        placeholder="Calle y numero"
-                        value={form.data.address_line_1}
-                        onChange={(e) => form.setData('address_line_1', e.target.value)}
-                        disabled={form.processing}
-                        error={form.errors.address_line_1}
-                    />
+                    {showManualForm && (
+                        <>
+                            <TextInput
+                                label="Nombre de contacto"
+                                icon={User}
+                                placeholder="Nombre completo"
+                                value={form.data.name}
+                                onChange={(e) => form.setData('name', e.target.value)}
+                                disabled={form.processing}
+                                error={form.errors.name}
+                            />
 
-                    <TextInput
-                        label="Direccion linea 2 (opcional)"
-                        icon={MapPin}
-                        placeholder="Interior, colonia, etc."
-                        value={form.data.address_line_2}
-                        onChange={(e) => form.setData('address_line_2', e.target.value)}
-                        disabled={form.processing}
-                        error={form.errors.address_line_2}
-                    />
+                            <TextInput
+                                label="Direccion"
+                                icon={MapPin}
+                                placeholder="Calle y numero"
+                                value={form.data.address_line_1}
+                                onChange={(e) => form.setData('address_line_1', e.target.value)}
+                                disabled={form.processing}
+                                error={form.errors.address_line_1}
+                            />
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <TextInput
-                            label="Ciudad"
-                            placeholder="Ciudad"
-                            value={form.data.city}
-                            onChange={(e) => form.setData('city', e.target.value)}
-                            disabled={form.processing}
-                            error={form.errors.city}
-                        />
-                        <TextInput
-                            label="Estado"
-                            placeholder="Estado"
-                            value={form.data.state}
-                            onChange={(e) => form.setData('state', e.target.value)}
-                            disabled={form.processing}
-                            error={form.errors.state}
-                        />
-                    </div>
+                            <TextInput
+                                label="Direccion linea 2 (opcional)"
+                                icon={MapPin}
+                                placeholder="Interior, colonia, etc."
+                                value={form.data.address_line_2}
+                                onChange={(e) => form.setData('address_line_2', e.target.value)}
+                                disabled={form.processing}
+                                error={form.errors.address_line_2}
+                            />
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <TextInput
-                            label="Codigo Postal"
-                            placeholder="00000"
-                            value={form.data.postal_code}
-                            onChange={(e) => form.setData('postal_code', e.target.value)}
-                            disabled={form.processing}
-                            error={form.errors.postal_code}
-                        />
-                        <TextInput
-                            label="Telefono"
-                            icon={Phone}
-                            type="tel"
-                            placeholder="10 digitos"
-                            value={form.data.phone}
-                            onChange={(e) => form.setData('phone', e.target.value)}
-                            disabled={form.processing}
-                            error={form.errors.phone}
-                        />
-                    </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <TextInput
+                                    label="Ciudad"
+                                    placeholder="Ciudad"
+                                    value={form.data.city}
+                                    onChange={(e) => form.setData('city', e.target.value)}
+                                    disabled={form.processing}
+                                    error={form.errors.city}
+                                />
+                                <TextInput
+                                    label="Estado"
+                                    placeholder="Estado"
+                                    value={form.data.state}
+                                    onChange={(e) => form.setData('state', e.target.value)}
+                                    disabled={form.processing}
+                                    error={form.errors.state}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <TextInput
+                                    label="Codigo Postal"
+                                    placeholder="00000"
+                                    value={form.data.postal_code}
+                                    onChange={(e) => form.setData('postal_code', e.target.value)}
+                                    disabled={form.processing}
+                                    error={form.errors.postal_code}
+                                />
+                                <TextInput
+                                    label="Telefono"
+                                    icon={Phone}
+                                    type="tel"
+                                    placeholder="10 digitos"
+                                    value={form.data.phone}
+                                    onChange={(e) => form.setData('phone', e.target.value)}
+                                    disabled={form.processing}
+                                    error={form.errors.phone}
+                                />
+                            </div>
+                        </>
+                    )}
 
                     {pageErrors.checkout && <p className="text-sm font-medium text-red-500">{pageErrors.checkout}</p>}
 
                     <button
                         type="submit"
-                        disabled={form.processing}
+                        disabled={form.processing || selectedAddressId === null}
                         className="bg-brand-green flex h-14 items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
                     >
                         {form.processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continuar al Pago'}
@@ -289,9 +406,7 @@ export default function Checkout({ cart, checkoutUrl }: CheckoutProps) {
                 </form>
             )}
 
-            {step === 'payment' && checkoutUrl && (
-                <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />
-            )}
+            {step === 'payment' && checkoutUrl && <PaymentPending checkoutUrl={checkoutUrl} onPaid={() => setStep('success')} />}
 
             {step === 'success' && <SuccessStep />}
         </>
