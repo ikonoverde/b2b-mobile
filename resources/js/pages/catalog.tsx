@@ -1,10 +1,18 @@
 import { Head, InfiniteScroll, router } from '@inertiajs/react';
-import { Loader2, PackageOpen, Search, X } from 'lucide-react';
+import { ChevronDown, Loader2, PackageOpen, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CatalogProductCard } from '@/components/catalog/CatalogProductCard';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types';
+
+const SORT_OPTIONS = [
+    { label: 'Mas recientes', value: 'newest' },
+    { label: 'Precio: menor a mayor', value: 'price_asc' },
+    { label: 'Precio: mayor a menor', value: 'price_desc' },
+    { label: 'Nombre: A-Z', value: 'name_asc' },
+    { label: 'Nombre: Z-A', value: 'name_desc' },
+] as const;
 
 interface Product {
     id: number;
@@ -21,9 +29,10 @@ interface CatalogProps {
     productsTotal: number;
     categories: Category[];
     selectedCategoryId: number | null;
+    selectedSort: string;
 }
 
-export default function Catalog({ products, productsTotal, categories, selectedCategoryId }: CatalogProps) {
+export default function Catalog({ products, productsTotal, categories, selectedCategoryId, selectedSort }: CatalogProps) {
     const [search, setSearch] = useState('');
 
     const filtered = useMemo(() => {
@@ -36,9 +45,21 @@ export default function Catalog({ products, productsTotal, categories, selectedC
     }, [products.data, search]);
 
     function handleCategorySelect(categoryId: number | null) {
-        const query: Record<string, string> = {};
+        const query: Record<string, string> = { sort: selectedSort };
         if (categoryId !== null) {
             query.category_id = String(categoryId);
+        }
+
+        router.get(window.location.pathname, query, {
+            preserveState: false,
+            preserveScroll: false,
+        });
+    }
+
+    function handleSortChange(sort: string) {
+        const query: Record<string, string> = { sort };
+        if (selectedCategoryId !== null) {
+            query.category_id = String(selectedCategoryId);
         }
 
         router.get(window.location.pathname, query, {
@@ -82,6 +103,22 @@ export default function Catalog({ products, productsTotal, categories, selectedC
                             <X className="h-4 w-4" />
                         </button>
                     )}
+                </div>
+
+                {/* Sort */}
+                <div className="relative">
+                    <select
+                        value={selectedSort}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        className="text-brand-green focus:ring-brand-green/30 w-full appearance-none rounded-xl border-0 bg-white py-2.5 pl-3 pr-9 text-sm font-medium shadow-sm ring-1 ring-black/[0.06] focus:outline-none focus:ring-2"
+                    >
+                        {SORT_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                    <ChevronDown className="text-brand-muted-green pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 </div>
 
                 {/* Category Tabs */}

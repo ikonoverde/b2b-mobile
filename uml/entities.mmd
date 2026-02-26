@@ -19,7 +19,7 @@ classDiagram
     class ProductService {
         -ApiClient apiClient
         +getFeaturedProducts() array
-        +getProducts(int page, int perPage, ?array categoryId) array
+        +getProducts(int page, int perPage, ?array categoryId, ?string sort) array
         +getProduct(int id) array
     }
 

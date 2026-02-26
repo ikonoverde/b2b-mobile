@@ -23,11 +23,16 @@ class ProductService
         int $page = 1,
         int $perPage = 15,
         ?array $categoryId = null,
+        ?string $sort = null,
     ): array {
         $query = ['page' => $page, 'per_page' => $perPage];
 
         if ($categoryId !== null) {
             $query['category_id'] = $categoryId;
+        }
+
+        if ($sort !== null) {
+            $query['sort'] = $sort;
         }
 
         return $this->apiClient->get('/products', $query)->json();

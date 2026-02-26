@@ -22,11 +22,13 @@ class CatalogController extends Controller
     ): Response {
         $page = (int) $request->query('page', 1);
         $categoryId = $request->query('category_id');
+        $sort = $request->query('sort', 'newest');
 
         $response = $productService->getProducts(
             page: $page,
             perPage: 15,
             categoryId: $categoryId ? [(int) $categoryId] : null,
+            sort: $sort,
         );
 
         $meta = $response['meta'] ?? [];
@@ -54,6 +56,7 @@ class CatalogController extends Controller
             'productsTotal' => $total,
             'categories' => $categories['data'] ?? [],
             'selectedCategoryId' => $categoryId ? (int) $categoryId : null,
+            'selectedSort' => $sort,
         ]);
     }
 }
