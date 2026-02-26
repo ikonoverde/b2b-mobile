@@ -282,3 +282,32 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
 
 </laravel-boost-guidelines>
+
+## External API
+
+- This app is a thin client that proxies all data through an external API via `ApiClient`.
+- Always fetch the latest API docs before implementing features that depend on API endpoints.
+- Use the `fetch-api-docs` skill script to retrieve endpoint details:
+    ```bash
+    # List all endpoints
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs
+    # Get specific endpoint details (parameters, request body, responses)
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs /api/products /api/categories
+    # Search by keyword
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs --search checkout
+    ```
+
+## Code quality
+
+- Always document classes and methods
+- Before committing, ALWAYS run auto-formatting with `qlty fmt`
+- Before finishing, ALWAYS run `qlty check --fix --level=low` and fix any lint errors
+- Before finishing, ALWAYS run `qlty smells` and fix any issues
+- Before finishing, ALWAYS run `qlty metrics --sort complexity --limit=5 app/`
+    - Max accepted cyclo: 10
+    - Max accepted cognitive/complex: 15
+    - Refactor anything above those limits to lower the complexity
+- Before finishing, ALWAYS run `qlty metrics --sort complexity --limit=5 resources/`
+    - Max accepted cyclo: 15
+    - Max accepted cognitive/complex: 20
+    - Refactor anything above those limits to lower the complexity

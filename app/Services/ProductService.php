@@ -47,6 +47,16 @@ class ProductService
     }
 
     /**
+     * Fetch products in the same category, excluding the given product.
+     *
+     * Requests one extra item to account for filtering out the current product,
+     * ensuring up to $limit results are returned.
+     *
+     * @param  int  $productId  Product to exclude from results
+     * @param  int  $categoryId  Category to filter by
+     * @param  int  $limit  Maximum number of related products to return
+     * @return array<int, array{id: int, name: string, price: float, category_id: int}>
+     *
      * @throws ConnectionException
      */
     public function getRelatedProducts(
