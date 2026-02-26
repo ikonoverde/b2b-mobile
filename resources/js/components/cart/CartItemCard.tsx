@@ -36,47 +36,41 @@ export function CartItemCard({ item }: CartItemCardProps) {
     return (
         <div className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/[0.06]">
             {/* Image */}
-            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-brand-cream">
+            <div className="bg-brand-cream h-20 w-20 shrink-0 overflow-hidden rounded-xl">
                 <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
             </div>
 
             {/* Details */}
             <div className="flex flex-1 flex-col justify-between">
                 <div className="flex items-start justify-between gap-2">
-                    <span className="line-clamp-2 text-[13px] font-semibold leading-tight text-brand-green">
-                        {item.name}
-                    </span>
+                    <span className="text-brand-green line-clamp-2 text-[13px] font-semibold leading-tight">{item.name}</span>
                     <button
                         onClick={removeItem}
-                        className="shrink-0 rounded-lg p-1.5 text-brand-muted-text transition-colors active:bg-red-50 active:text-red-500"
+                        className="text-brand-muted-text shrink-0 rounded-lg p-1.5 transition-colors active:bg-red-50 active:text-red-500"
                     >
                         <Trash2 className="h-4 w-4" />
                     </button>
                 </div>
 
                 <div className="flex items-end justify-between">
-                    <span className="text-sm font-bold text-brand-accent-brown">
-                        {formatCurrency(item.subtotal)}
-                    </span>
+                    <span className="text-brand-accent-brown text-sm font-bold">{formatCurrency(item.subtotal)}</span>
 
                     {/* Quantity controls */}
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => updateQuantity(item.quantity - 1)}
                             disabled={updating || item.quantity <= 1}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-cream transition-colors disabled:opacity-40"
+                            className="bg-brand-cream flex h-7 w-7 items-center justify-center rounded-lg transition-colors disabled:opacity-40"
                         >
-                            <Minus className="h-3.5 w-3.5 text-brand-green" />
+                            <Minus className="text-brand-green h-3.5 w-3.5" />
                         </button>
-                        <span className="min-w-[2ch] text-center text-sm font-bold text-brand-green">
-                            {item.quantity}
-                        </span>
+                        <span className="text-brand-green min-w-[2ch] text-center text-sm font-bold">{item.quantity}</span>
                         <button
                             onClick={() => updateQuantity(item.quantity + 1)}
                             disabled={updating}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-cream transition-colors disabled:opacity-40"
+                            className="bg-brand-cream flex h-7 w-7 items-center justify-center rounded-lg transition-colors disabled:opacity-40"
                         >
-                            <Plus className="h-3.5 w-3.5 text-brand-green" />
+                            <Plus className="text-brand-green h-3.5 w-3.5" />
                         </button>
                     </div>
                 </div>

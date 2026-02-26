@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { formatCurrency } from '@/lib/format';
+import type { Category } from '@/types';
 
 interface PricingTier {
     min_quantity: number;
@@ -13,7 +14,7 @@ interface PricingTier {
 interface Product {
     id: number;
     name: string;
-    category: string;
+    category: Category;
     price: number;
     image: string;
     description?: string;
@@ -34,9 +35,7 @@ export default function ProductShow({ product }: ProductShowProps) {
     const activeTier = useMemo(() => {
         if (!product.pricing_tiers?.length) return null;
 
-        return product.pricing_tiers.find(
-            (tier) => quantity >= tier.min_quantity && (tier.max_quantity === null || quantity <= tier.max_quantity),
-        );
+        return product.pricing_tiers.find((tier) => quantity >= tier.min_quantity && (tier.max_quantity === null || quantity <= tier.max_quantity));
     }, [product.pricing_tiers, quantity]);
 
     const unitPrice = activeTier?.price ?? product.price;
@@ -77,31 +76,29 @@ export default function ProductShow({ product }: ProductShowProps) {
                     onClick={() => window.history.back()}
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-black/[0.06]"
                 >
-                    <ArrowLeft className="h-5 w-5 text-brand-green" />
+                    <ArrowLeft className="text-brand-green h-5 w-5" />
                 </button>
             </div>
 
             {/* Product Image */}
             <div className="mx-6 mt-3 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.06]">
-                <div className="aspect-square overflow-hidden bg-brand-cream">
+                <div className="bg-brand-cream aspect-square overflow-hidden">
                     <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                 </div>
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col gap-1 px-6 pt-5">
-                <span className="text-[11px] font-semibold tracking-wide text-brand-muted-green uppercase">
-                    {product.category}
-                </span>
-                <h1 className="text-xl font-bold text-brand-green">{product.name}</h1>
-                {product.size && <p className="text-sm text-brand-muted-text">{product.size}</p>}
-                {product.description && <p className="mt-1 text-sm leading-relaxed text-brand-muted-text">{product.description}</p>}
+                <span className="text-brand-muted-green text-[11px] font-semibold uppercase tracking-wide">{product.category.name}</span>
+                <h1 className="text-brand-green text-xl font-bold">{product.name}</h1>
+                {product.size && <p className="text-brand-muted-text text-sm">{product.size}</p>}
+                {product.description && <p className="text-brand-muted-text mt-1 text-sm leading-relaxed">{product.description}</p>}
             </div>
 
             {/* Pricing Tiers */}
             {product.pricing_tiers && product.pricing_tiers.length > 0 && (
                 <div className="flex flex-col gap-3 px-6 pt-5">
-                    <h2 className="text-sm font-bold text-brand-green">Precios por Volumen</h2>
+                    <h2 className="text-brand-green text-sm font-bold">Precios por Volumen</h2>
                     <div className="flex flex-col gap-2">
                         {product.pricing_tiers.map((tier, idx) => {
                             const isActive = activeTier === tier;
@@ -110,17 +107,14 @@ export default function ProductShow({ product }: ProductShowProps) {
                                     key={idx}
                                     className={[
                                         'flex items-center justify-between rounded-xl px-4 py-3 transition-colors duration-200',
-                                        isActive
-                                            ? 'bg-brand-green/10 ring-1 ring-brand-green/30'
-                                            : 'bg-white ring-1 ring-black/[0.06]',
+                                        isActive ? 'bg-brand-green/10 ring-brand-green/30 ring-1' : 'bg-white ring-1 ring-black/[0.06]',
                                     ].join(' ')}
                                 >
                                     <div className="flex flex-col">
                                         <span
-                                            className={[
-                                                'text-[13px] font-semibold',
-                                                isActive ? 'text-brand-green' : 'text-brand-muted-text',
-                                            ].join(' ')}
+                                            className={['text-[13px] font-semibold', isActive ? 'text-brand-green' : 'text-brand-muted-text'].join(
+                                                ' ',
+                                            )}
                                         >
                                             {tier.max_quantity
                                                 ? `${tier.min_quantity} – ${tier.max_quantity} unidades`
@@ -128,10 +122,7 @@ export default function ProductShow({ product }: ProductShowProps) {
                                         </span>
                                     </div>
                                     <span
-                                        className={[
-                                            'text-base font-bold',
-                                            isActive ? 'text-brand-accent-brown' : 'text-brand-muted-text',
-                                        ].join(' ')}
+                                        className={['text-base font-bold', isActive ? 'text-brand-accent-brown' : 'text-brand-muted-text'].join(' ')}
                                     >
                                         {formatCurrency(tier.price)}
                                     </span>
@@ -144,21 +135,21 @@ export default function ProductShow({ product }: ProductShowProps) {
 
             {/* Quantity Selector */}
             <div className="flex flex-col gap-3 px-6 pt-5">
-                <h2 className="text-sm font-bold text-brand-green">Cantidad</h2>
+                <h2 className="text-brand-green text-sm font-bold">Cantidad</h2>
                 <div className="flex items-center gap-4">
                     <button
                         onClick={decrement}
                         disabled={quantity <= 1}
                         className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-black/[0.06] transition-colors disabled:opacity-40"
                     >
-                        <Minus className="h-4 w-4 text-brand-green" />
+                        <Minus className="text-brand-green h-4 w-4" />
                     </button>
-                    <span className="min-w-[3ch] text-center text-lg font-bold text-brand-green">{quantity}</span>
+                    <span className="text-brand-green min-w-[3ch] text-center text-lg font-bold">{quantity}</span>
                     <button
                         onClick={increment}
                         className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-black/[0.06] transition-colors"
                     >
-                        <Plus className="h-4 w-4 text-brand-green" />
+                        <Plus className="text-brand-green h-4 w-4" />
                     </button>
                 </div>
             </div>

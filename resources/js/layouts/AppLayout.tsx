@@ -1,9 +1,9 @@
+import { usePage } from '@inertiajs/react';
+import { Agentation } from 'agentation';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
 import { UnauthHeader } from '@/components/home/UnauthHeader';
-import { usePage } from '@inertiajs/react';
-import { Agentation } from 'agentation';
 
 function updateBottomNav(cartItemCount: number) {
     const badge = cartItemCount > 0 ? String(cartItemCount) : null;
@@ -15,10 +15,22 @@ function updateBottomNav(cartItemCount: number) {
             data: {
                 label_visibility: 'labeled',
                 children: [
-                    { type: 'bottom_nav_item', data: { id: 'home', icon: 'home', label: 'Inicio', url: '/', active: currentPath === '/' || currentPath === '/dashboard' } },
-                    { type: 'bottom_nav_item', data: { id: 'catalog', icon: 'grid_view', label: 'Catálogo', url: '/catalog', active: currentPath.startsWith('/catalog') } },
-                    { type: 'bottom_nav_item', data: { id: 'cart', icon: 'shopping_cart', label: 'Carrito', url: '/cart', badge, active: currentPath.startsWith('/cart') } },
-                    { type: 'bottom_nav_item', data: { id: 'account', icon: 'person', label: 'Cuenta', url: '/account', active: currentPath.startsWith('/account') } },
+                    {
+                        type: 'bottom_nav_item',
+                        data: { id: 'home', icon: 'home', label: 'Inicio', url: '/', active: currentPath === '/' || currentPath === '/dashboard' },
+                    },
+                    {
+                        type: 'bottom_nav_item',
+                        data: { id: 'catalog', icon: 'grid_view', label: 'Catálogo', url: '/catalog', active: currentPath.startsWith('/catalog') },
+                    },
+                    {
+                        type: 'bottom_nav_item',
+                        data: { id: 'cart', icon: 'shopping_cart', label: 'Carrito', url: '/cart', badge, active: currentPath.startsWith('/cart') },
+                    },
+                    {
+                        type: 'bottom_nav_item',
+                        data: { id: 'account', icon: 'person', label: 'Cuenta', url: '/account', active: currentPath.startsWith('/account') },
+                    },
                 ],
             },
         },
@@ -50,10 +62,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
     return (
         <>
-            <div className="flex min-h-screen flex-col bg-brand-green">
+            <div className="bg-brand-green flex min-h-screen flex-col">
                 <UnauthHeader />
 
-                <main className="flex flex-1 flex-col overflow-y-auto bg-brand-cream pb-6">{children}</main>
+                <main className="bg-brand-cream flex flex-1 flex-col overflow-y-auto pb-6">{children}</main>
             </div>
             <Agentation />
         </>

@@ -4,15 +4,14 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @theme {
-    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-brand-green: #5E7052;
-    --color-brand-light-green: #D4E5D0;
-    --color-brand-muted-green: #A8B5A0;
-    --color-brand-accent-brown: #8B6F47;
-    --color-brand-cream: #FAF6F1;
-    --color-brand-icon-bg-green: #D4E5D0;
-    --color-brand-icon-bg-brown: #E8DCC8;
-    --color-brand-muted-text: #6B7B63;
+    --color-brand-green: #5e7052;
+    --color-brand-light-green: #d4e5d0;
+    --color-brand-muted-green: #a8b5a0;
+    --color-brand-accent-brown: #8b6f47;
+    --color-brand-cream: #faf6f1;
+    --color-brand-icon-bg-green: #d4e5d0;
+    --color-brand-icon-bg-brown: #e8dcc8;
+    --color-brand-muted-text: #6b7b63;
 }

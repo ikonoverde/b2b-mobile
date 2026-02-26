@@ -42,24 +42,22 @@ function OrderCard({ order }: { order: Order }) {
             {/* Card Header */}
             <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex w-full items-center gap-3 p-4 text-left transition-colors active:bg-brand-cream"
+                className="active:bg-brand-cream flex w-full items-center gap-3 p-4 text-left transition-colors"
             >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-icon-bg-green">
-                    <Package className="h-5 w-5 text-brand-green" />
+                <div className="bg-brand-icon-bg-green flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                    <Package className="text-brand-green h-5 w-5" />
                 </div>
 
                 <div className="flex flex-1 flex-col gap-1">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-brand-green">Pedido #{order.id}</span>
-                        <span className="text-base font-bold text-brand-accent-brown">
-                            {formatCurrency(order.total_amount)}
-                        </span>
+                        <span className="text-brand-green text-sm font-bold">Pedido #{order.id}</span>
+                        <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(order.total_amount)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-brand-muted-text">{formatDate(order.created_at)}</span>
-                            <span className="text-xs text-brand-muted-text">&middot;</span>
-                            <span className="text-xs text-brand-muted-text">
+                            <span className="text-brand-muted-text text-xs">{formatDate(order.created_at)}</span>
+                            <span className="text-brand-muted-text text-xs">&middot;</span>
+                            <span className="text-brand-muted-text text-xs">
                                 {itemCount} {itemCount === 1 ? 'producto' : 'productos'}
                             </span>
                         </div>
@@ -71,47 +69,38 @@ function OrderCard({ order }: { order: Order }) {
                 </div>
 
                 <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-brand-muted-green transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+                    className={`text-brand-muted-green h-4 w-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
                 />
             </button>
 
             {/* Expandable Details */}
-            <div
-                className={`grid transition-[grid-template-rows] duration-200 ease-out ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
-            >
+            <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
                 <div className="overflow-hidden">
                     <div className="border-t border-black/[0.06] px-4 pb-4">
                         {/* Items */}
                         <div className="flex flex-col gap-2 pt-3">
-                            <span className="text-xs font-bold tracking-wide text-brand-green uppercase">
-                                Productos
-                            </span>
+                            <span className="text-brand-green text-xs font-bold uppercase tracking-wide">Productos</span>
                             {order.items.map((item) => (
                                 <div key={item.id} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className="flex h-5 min-w-5 items-center justify-center rounded bg-brand-light-green text-[10px] font-bold text-brand-green">
+                                        <span className="bg-brand-light-green text-brand-green flex h-5 min-w-5 items-center justify-center rounded text-[10px] font-bold">
                                             {item.quantity}
                                         </span>
-                                        <span className="text-sm text-brand-green">{item.product_name}</span>
+                                        <span className="text-brand-green text-sm">{item.product_name}</span>
                                     </div>
-                                    <span className="text-sm font-medium text-brand-green">
-                                        {formatCurrency(item.subtotal)}
-                                    </span>
+                                    <span className="text-brand-green text-sm font-medium">{formatCurrency(item.subtotal)}</span>
                                 </div>
                             ))}
                         </div>
 
                         {/* Shipping Address */}
                         {order.shipping_address && (
-                            <div className="mt-3 flex items-start gap-2.5 rounded-xl bg-brand-cream p-3">
-                                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-muted-green" />
+                            <div className="bg-brand-cream mt-3 flex items-start gap-2.5 rounded-xl p-3">
+                                <MapPin className="text-brand-muted-green mt-0.5 h-3.5 w-3.5 shrink-0" />
                                 <div className="flex flex-col gap-0.5">
-                                    <span className="text-xs font-semibold text-brand-green">
-                                        {order.shipping_address.street}
-                                    </span>
-                                    <span className="text-xs text-brand-muted-text">
-                                        {order.shipping_address.city}, {order.shipping_address.state}{' '}
-                                        {order.shipping_address.zip}
+                                    <span className="text-brand-green text-xs font-semibold">{order.shipping_address.street}</span>
+                                    <span className="text-brand-muted-text text-xs">
+                                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.zip}
                                     </span>
                                 </div>
                             </div>
@@ -121,19 +110,15 @@ function OrderCard({ order }: { order: Order }) {
                         <div className="mt-3 flex flex-col gap-1.5 border-t border-black/[0.06] pt-3">
                             <div className="flex justify-between text-xs">
                                 <span className="text-brand-muted-text">Subtotal</span>
-                                <span className="font-medium text-brand-green">{formatCurrency(subtotal)}</span>
+                                <span className="text-brand-green font-medium">{formatCurrency(subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-xs">
                                 <span className="text-brand-muted-text">Envío</span>
-                                <span className="font-medium text-brand-green">
-                                    {formatCurrency(order.shipping_cost)}
-                                </span>
+                                <span className="text-brand-green font-medium">{formatCurrency(order.shipping_cost)}</span>
                             </div>
                             <div className="flex justify-between border-t border-black/[0.06] pt-1.5">
-                                <span className="text-sm font-bold text-brand-green">Total</span>
-                                <span className="text-sm font-bold text-brand-accent-brown">
-                                    {formatCurrency(order.total_amount)}
-                                </span>
+                                <span className="text-brand-green text-sm font-bold">Total</span>
+                                <span className="text-brand-accent-brown text-sm font-bold">{formatCurrency(order.total_amount)}</span>
                             </div>
                         </div>
                     </div>
@@ -150,10 +135,10 @@ export default function OrdersIndex({ orders, ordersTotal }: OrdersProps) {
         <>
             <Head title="Mis Pedidos" />
 
-            <div className="flex items-center justify-between px-6 pt-6 pb-4">
-                <h1 className="text-xl font-bold text-brand-green">Mis Pedidos</h1>
+            <div className="flex items-center justify-between px-6 pb-4 pt-6">
+                <h1 className="text-brand-green text-xl font-bold">Mis Pedidos</h1>
                 {!isEmpty && (
-                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-green px-2 text-xs font-bold text-white">
+                    <span className="bg-brand-green flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-bold text-white">
                         {ordersTotal}
                     </span>
                 )}
@@ -161,26 +146,21 @@ export default function OrdersIndex({ orders, ordersTotal }: OrdersProps) {
 
             {isEmpty ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                        <ClipboardList className="h-10 w-10 text-brand-green" />
+                    <div className="bg-brand-icon-bg-green flex h-20 w-20 items-center justify-center rounded-full">
+                        <ClipboardList className="text-brand-green h-10 w-10" />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                        <h2 className="text-xl font-bold text-brand-green">Sin pedidos aún</h2>
-                        <p className="text-center text-sm text-brand-muted-text">
-                            Cuando realices tu primer pedido, aparecerá aquí.
-                        </p>
+                        <h2 className="text-brand-green text-xl font-bold">Sin pedidos aún</h2>
+                        <p className="text-brand-muted-text text-center text-sm">Cuando realices tu primer pedido, aparecerá aquí.</p>
                     </div>
                     <div className="flex gap-3 pt-2">
                         <Link
                             href="/dashboard"
-                            className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-brand-green shadow-sm ring-1 ring-black/[0.06]"
+                            className="text-brand-green rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold shadow-sm ring-1 ring-black/[0.06]"
                         >
                             Ir al Inicio
                         </Link>
-                        <Link
-                            href="/catalog"
-                            className="rounded-xl bg-brand-green px-5 py-2.5 text-[13px] font-semibold text-white"
-                        >
+                        <Link href="/catalog" className="bg-brand-green rounded-xl px-5 py-2.5 text-[13px] font-semibold text-white">
                             Ver Catálogo
                         </Link>
                     </div>
@@ -192,7 +172,7 @@ export default function OrdersIndex({ orders, ordersTotal }: OrdersProps) {
                     onlyNext
                     loading={
                         <div className="flex justify-center py-4">
-                            <Loader2 className="h-6 w-6 animate-spin text-brand-muted-green" />
+                            <Loader2 className="text-brand-muted-green h-6 w-6 animate-spin" />
                         </div>
                     }
                 >

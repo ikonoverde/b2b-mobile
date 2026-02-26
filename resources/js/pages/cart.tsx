@@ -21,13 +21,13 @@ export default function CartPage({ cart }: CartPageProps) {
         <>
             <Head title="Carrito" />
 
-            <div className="flex flex-col gap-4 px-6 pt-6 pb-4">
+            <div className="flex flex-col gap-4 px-6 pb-4 pt-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-brand-green">Mi Carrito</h1>
+                    <h1 className="text-brand-green text-xl font-bold">Mi Carrito</h1>
                     {!isEmpty && (
                         <button
                             onClick={clearCart}
-                            className="flex items-center gap-1.5 text-[13px] font-medium text-brand-muted-text transition-colors active:text-red-500"
+                            className="text-brand-muted-text flex items-center gap-1.5 text-[13px] font-medium transition-colors active:text-red-500"
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                             Vaciar
@@ -38,17 +38,14 @@ export default function CartPage({ cart }: CartPageProps) {
 
             {isEmpty ? (
                 <div className="flex flex-col items-center gap-4 px-6 py-12">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                        <ShoppingCart className="h-8 w-8 text-brand-green" />
+                    <div className="bg-brand-icon-bg-green flex h-16 w-16 items-center justify-center rounded-full">
+                        <ShoppingCart className="text-brand-green h-8 w-8" />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-base font-semibold text-brand-green">Carrito vacío</span>
-                        <span className="text-sm text-brand-muted-text">Agrega productos desde el catálogo</span>
+                        <span className="text-brand-green text-base font-semibold">Carrito vacío</span>
+                        <span className="text-brand-muted-text text-sm">Agrega productos desde el catálogo</span>
                     </div>
-                    <Link
-                        href="/catalog"
-                        className="rounded-xl bg-brand-green px-6 py-2.5 text-[13px] font-semibold text-white"
-                    >
+                    <Link href="/catalog" className="bg-brand-green rounded-xl px-6 py-2.5 text-[13px] font-semibold text-white">
                         Explorar Catálogo
                     </Link>
                 </div>
@@ -63,26 +60,20 @@ export default function CartPage({ cart }: CartPageProps) {
 
                     {/* Order Summary */}
                     <div className="mx-6 mt-4 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
-                        <h2 className="text-sm font-bold text-brand-green">Resumen del Pedido</h2>
+                        <h2 className="text-brand-green text-sm font-bold">Resumen del Pedido</h2>
                         <div className="flex flex-col gap-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-brand-muted-text">Subtotal</span>
-                                <span className="font-medium text-brand-green">
-                                    {formatCurrency(cart.totals.subtotal)}
-                                </span>
+                                <span className="text-brand-green font-medium">{formatCurrency(cart.totals.subtotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-brand-muted-text">Envío</span>
-                                <span className="font-medium text-brand-green">
-                                    {formatCurrency(cart.totals.shipping)}
-                                </span>
+                                <span className="text-brand-green font-medium">{formatCurrency(cart.totals.shipping)}</span>
                             </div>
                             <div className="border-t border-black/[0.06] pt-2">
                                 <div className="flex justify-between">
-                                    <span className="text-sm font-bold text-brand-green">Total</span>
-                                    <span className="text-base font-bold text-brand-accent-brown">
-                                        {formatCurrency(cart.totals.total)}
-                                    </span>
+                                    <span className="text-brand-green text-sm font-bold">Total</span>
+                                    <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(cart.totals.total)}</span>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +86,7 @@ export default function CartPage({ cart }: CartPageProps) {
                     <div className="fixed inset-x-0 bottom-0 border-t border-black/[0.06] bg-white/95 px-6 py-4 backdrop-blur-sm">
                         <Link
                             href="/checkout"
-                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-green px-6 py-3.5 text-[15px] font-bold text-white transition-all duration-200 active:scale-[0.98]"
+                            className="bg-brand-green flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-[15px] font-bold text-white transition-all duration-200 active:scale-[0.98]"
                         >
                             Realizar Pedido
                         </Link>

@@ -3,11 +3,12 @@ import { PackageOpen, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CatalogProductCard } from '@/components/catalog/CatalogProductCard';
+import type { Category } from '@/types';
 
 interface Product {
     id: number;
     name: string;
-    category: string;
+    category: Category;
     price: number;
     image: string;
     sku?: string;
@@ -26,10 +27,7 @@ export default function Catalog({ products }: CatalogProps) {
 
         const q = search.toLowerCase();
         return products.filter(
-            (p) =>
-                p.name.toLowerCase().includes(q) ||
-                p.category.toLowerCase().includes(q) ||
-                (p.sku && p.sku.toLowerCase().includes(q)),
+            (p) => p.name.toLowerCase().includes(q) || p.category.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q)),
         );
     }, [products, search]);
 
@@ -37,29 +35,26 @@ export default function Catalog({ products }: CatalogProps) {
         <>
             <Head title="Catálogo" />
 
-            <div className="flex flex-col gap-4 px-6 pt-6 pb-4">
+            <div className="flex flex-col gap-4 px-6 pb-4 pt-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-brand-green">Catálogo</h1>
-                    <span className="text-[13px] font-medium text-brand-muted-text">
+                    <h1 className="text-brand-green text-xl font-bold">Catálogo</h1>
+                    <span className="text-brand-muted-text text-[13px] font-medium">
                         {filtered.length} {filtered.length === 1 ? 'producto' : 'productos'}
                     </span>
                 </div>
 
                 {/* Search */}
                 <div className="relative">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-brand-muted-green" />
+                    <Search className="text-brand-muted-green absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Buscar producto, categoría o SKU..."
-                        className="w-full rounded-xl border-0 bg-white py-2.5 pr-9 pl-9 text-sm text-brand-green shadow-sm ring-1 ring-black/[0.06] placeholder:text-brand-muted-green/60 focus:ring-2 focus:ring-brand-green/30 focus:outline-none"
+                        className="text-brand-green placeholder:text-brand-muted-green/60 focus:ring-brand-green/30 w-full rounded-xl border-0 bg-white py-2.5 pl-9 pr-9 text-sm shadow-sm ring-1 ring-black/[0.06] focus:outline-none focus:ring-2"
                     />
                     {search && (
-                        <button
-                            onClick={() => setSearch('')}
-                            className="absolute top-1/2 right-3 -translate-y-1/2 text-brand-muted-green"
-                        >
+                        <button onClick={() => setSearch('')} className="text-brand-muted-green absolute right-3 top-1/2 -translate-y-1/2">
                             <X className="h-4 w-4" />
                         </button>
                     )}
@@ -74,7 +69,7 @@ export default function Catalog({ products }: CatalogProps) {
                             key={product.id}
                             id={product.id}
                             name={product.name}
-                            category={product.category}
+                            category={product.category.name}
                             price={product.price}
                             image={product.image}
                             isFeatured={product.is_featured}
@@ -83,15 +78,15 @@ export default function Catalog({ products }: CatalogProps) {
                 </div>
             ) : (
                 <div className="flex flex-col items-center gap-3 px-6 py-12">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                        <PackageOpen className="h-7 w-7 text-brand-green" />
+                    <div className="bg-brand-icon-bg-green flex h-14 w-14 items-center justify-center rounded-full">
+                        <PackageOpen className="text-brand-green h-7 w-7" />
                     </div>
-                    <p className="text-center text-sm text-brand-muted-text">
+                    <p className="text-brand-muted-text text-center text-sm">
                         No se encontraron productos
                         {search && (
                             <>
                                 {' '}
-                                para "<span className="font-semibold text-brand-green">{search}</span>"
+                                para "<span className="text-brand-green font-semibold">{search}</span>"
                             </>
                         )}
                     </p>

@@ -3,12 +3,13 @@ import { Grid, Headphones, Percent, Truck, UserPlus } from 'lucide-react';
 
 import { BenefitCard } from '@/components/home/BenefitCard';
 import { ProductCard } from '@/components/products/ProductCard';
-import { Auth } from '@/types/auth';
+import type { Category } from '@/types';
+import type { Auth } from '@/types/auth';
 
 interface Product {
     id: number;
     name: string;
-    category: string;
+    category: Category;
     price: number;
     image: string;
 }
@@ -28,13 +29,13 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
             </Head>
 
             {/* Hero Section */}
-            <div className="flex flex-col gap-2 px-6 pt-6 pb-4">
-                <h1 className="text-[28px] leading-9 font-bold">
+            <div className="flex flex-col gap-2 px-6 pb-4 pt-6">
+                <h1 className="text-[28px] font-bold leading-9">
                     <span className="text-brand-green">Productos Mayoristas</span>
                     <br />
                     <span className="text-brand-accent-brown">para tu Negocio</span>
                 </h1>
-                <p className="text-sm leading-[21px] text-brand-muted-text">
+                <p className="text-brand-muted-text text-sm leading-[21px]">
                     Accede a precios exclusivos, pedidos recurrentes y soporte dedicado para profesionales.
                 </p>
             </div>
@@ -49,17 +50,17 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
             {/* CTA Section */}
             {!auth.user && (
                 <div className="flex flex-col gap-3 px-6 pb-2">
-                    <Link href="/register" className="flex flex-col items-center gap-3 rounded-2xl bg-brand-green p-4">
+                    <Link href="/register" className="bg-brand-green flex flex-col items-center gap-3 rounded-2xl p-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
                             <UserPlus className="h-6 w-6 text-white" />
                         </div>
                         <span className="text-[13px] font-semibold text-white">Crear Cuenta</span>
                     </Link>
                     <Link href="/catalog" className="flex flex-col items-center gap-3 rounded-2xl bg-white p-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-icon-bg-green">
-                            <Grid className="h-6 w-6 text-brand-green" />
+                        <div className="bg-brand-icon-bg-green flex h-12 w-12 items-center justify-center rounded-full">
+                            <Grid className="text-brand-green h-6 w-6" />
                         </div>
-                        <span className="text-[13px] font-semibold text-brand-green">Ver Catálogo</span>
+                        <span className="text-brand-green text-[13px] font-semibold">Ver Catálogo</span>
                     </Link>
                 </div>
             )}
@@ -67,8 +68,8 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
             {/* Featured Products */}
             <div className="flex flex-col gap-4 px-6 pt-2">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-brand-green">Productos Destacados</h2>
-                    <Link href="/catalog" className="text-[13px] font-semibold text-brand-accent-brown">
+                    <h2 className="text-brand-green text-lg font-bold">Productos Destacados</h2>
+                    <Link href="/catalog" className="text-brand-accent-brown text-[13px] font-semibold">
                         Ver todo
                     </Link>
                 </div>
@@ -79,7 +80,7 @@ export default function Welcome({ featuredProducts }: WelcomeProps) {
                             id={product.id}
                             imageUrl={product.image}
                             name={product.name}
-                            size={product.category}
+                            size={product.category.name}
                             price={product.price}
                             showPrice={!!auth.user}
                         />
