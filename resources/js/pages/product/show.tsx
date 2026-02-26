@@ -1,10 +1,11 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { ImageGallery } from '@/components/products/ImageGallery';
 import { ImageModal } from '@/components/products/ImageModal';
 import { PricingTiers } from '@/components/products/PricingTiers';
+import { ProductCard } from '@/components/products/ProductCard';
 import { formatCurrency } from '@/lib/format';
 import type { Category, ProductImage } from '@/types';
 
@@ -27,11 +28,20 @@ interface Product {
     images?: ProductImage[];
 }
 
-interface ProductShowProps {
-    product: Product;
+interface RelatedProduct {
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    category: Category;
 }
 
-export default function ProductShow({ product }: ProductShowProps) {
+interface ProductShowProps {
+    product: Product;
+    relatedProducts: RelatedProduct[];
+}
+
+export default function ProductShow({ product, relatedProducts }: ProductShowProps) {
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(false);
     const [added, setAdded] = useState(false);
@@ -132,6 +142,20 @@ export default function ProductShow({ product }: ProductShowProps) {
                     </button>
                 </div>
             </div>
+
+            {/* Related Products */}
+            {relatedProducts.length > 0 && (
+                <div className="flex flex-col gap-4 px-6 pt-8">
+                    <h2 className="text-brand-green text-lg font-bold">Productos Relacionados</h2>
+                    <div className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-2">
+                        {relatedProducts.map((p) => (
+                            <Link key={p.id} href={`/product/${p.id}`}>
+                                <ProductCard id={p.id} imageUrl={p.image} name={p.name} size={p.category.name} price={p.price} showPrice />
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Spacer for fixed bottom button */}
             <div className="h-24" />

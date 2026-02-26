@@ -289,14 +289,14 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - This app is a thin client that proxies all data through an external API via `ApiClient`.
 - Always fetch the latest API docs before implementing features that depend on API endpoints.
 - Use the `fetch-api-docs` skill script to retrieve endpoint details:
-  ```bash
-  # List all endpoints
-  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs
-  # Get specific endpoint details (parameters, request body, responses)
-  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs /api/products /api/categories
-  # Search by keyword
-  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs --search checkout
-  ```
+    ```bash
+    # List all endpoints
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs
+    # Get specific endpoint details (parameters, request body, responses)
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs /api/products /api/categories
+    # Search by keyword
+    node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs --search checkout
+    ```
 
 ## Code quality
 
@@ -311,12 +311,3 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
     - Max accepted cyclo: 15
     - Max accepted cognitive/complex: 20
     - Refactor anything above those limits to lower the complexity
-
-
-## Application shape
-
-To have a better understanding of the application current state we will maintain uml diagrams in mermaidjs format
-
-- Use git to get the current changes
-- Only consider changes from app/
-- Before finish and after quality checks, ALWAYS update 

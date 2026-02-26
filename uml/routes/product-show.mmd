@@ -12,8 +12,20 @@ sequenceDiagram
     API-->>AC: { data: { id, name, image, images[], pricing_tiers[], ... } }
     AC-->>PS: Response
     PS-->>PC: array
-    PC-->>U: Inertia::render("product/show", { product })
+
+    PC->>PS: getRelatedProducts(productId, categoryId)
+    PS->>PS: getProducts(page: 1, categoryId: [categoryId])
+    PS->>AC: get("/products", { category_id, per_page })
+    AC->>API: GET /api/products?category_id[]=X
+    API-->>AC: { data: [...products] }
+    AC-->>PS: Response
+    PS->>PS: filter out current product
+    PS-->>PC: array
+
+    PC-->>U: Inertia::render("product/show", { product, relatedProducts })
 
     Note over U: product/show.tsx renders ImageGallery
     Note over U: User taps image → opens ImageModal
     Note over U: ImageModal supports swipe, pinch-to-zoom, dots
+    Note over U: Related products shown in horizontal carousel
+    Note over U: User taps related product → navigates to that product

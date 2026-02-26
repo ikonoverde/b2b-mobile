@@ -21,6 +21,7 @@ classDiagram
         +getFeaturedProducts() array
         +getProducts(int page, int perPage, ?array categoryId, ?string sort) array
         +getProduct(int id) array
+        +getRelatedProducts(int productId, int categoryId, int limit) array
     }
 
     class CartService {

@@ -19,7 +19,10 @@ export function ProductCard({ id, imageUrl, name, size, price, showPrice = true 
     const [added, setAdded] = useState(false);
     const { auth } = usePage<{ auth: Auth }>().props;
 
-    function addToCart() {
+    function addToCart(e: React.MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
         router.post(
             '/cart/items',
             { product_id: id, quantity: 1 },
@@ -79,7 +82,11 @@ export function ProductCard({ id, imageUrl, name, size, price, showPrice = true 
                     </div>
                 ) : (
                     <button
-                        onClick={() => router.visit('/login')}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.visit('/login');
+                        }}
                         className="bg-brand-cream active:bg-brand-icon-bg-brown flex items-center gap-1.5 rounded-xl px-2.5 py-2 transition-colors duration-150"
                     >
                         <Lock className="text-brand-accent-brown h-3 w-3" />

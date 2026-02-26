@@ -15,9 +15,15 @@ class ProductController extends Controller
     public function show(int $id, ProductService $productService): Response
     {
         $product = $productService->getProduct($id);
+        $productData = $product['data'];
+        $relatedProducts = $productService->getRelatedProducts(
+            $productData['id'],
+            $productData['category']['id'],
+        );
 
         return Inertia::render('product/show', [
-            'product' => $product['data'],
+            'product' => $productData,
+            'relatedProducts' => $relatedProducts,
         ]);
     }
 }

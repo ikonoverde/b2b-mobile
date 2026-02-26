@@ -45,4 +45,24 @@ class ProductService
     {
         return $this->apiClient->get("/products/{$id}")->json();
     }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function getRelatedProducts(
+        int $productId,
+        int $categoryId,
+        int $limit = 10,
+    ): array {
+        $response = $this->getProducts(
+            page: 1,
+            perPage: $limit + 1,
+            categoryId: [$categoryId],
+        );
+        $products = $response['data'] ?? [];
+
+        return array_values(
+            array_filter($products, fn (array $p): bool => $p['id'] !== $productId),
+        );
+    }
 }
