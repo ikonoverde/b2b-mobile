@@ -17,9 +17,10 @@ it('shows product detail page', function () {
 
     $this->get(route('product.show', 1))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('product/show')
-            ->where('product.name', 'Test Product')
+        ->assertInertia(
+            fn ($page) => $page
+                ->component('product/show')
+                ->where('product.name', 'Test Product')
         );
 });
 
@@ -34,6 +35,29 @@ it('passes correct product ID to API', function () {
     $this->get(route('product.show', 42))->assertOk();
 
     Http::assertSent(fn ($request) => str_contains($request->url(), '/products/42'));
+});
+
+it('passes product images to detail page', function () {
+    authenticatedUser();
+    $images = [
+        ['id' => 1, 'url' => 'https://example.com/img1.jpg', 'position' => 0],
+        ['id' => 2, 'url' => 'https://example.com/img2.jpg', 'position' => 1],
+    ];
+    fakeApiResponses([
+        'https://api.test/api/products/1' => Http::response([
+            'data' => fakeProduct(['images' => $images]),
+        ]),
+    ]);
+
+    $this->get(route('product.show', 1))
+        ->assertOk()
+        ->assertInertia(
+            fn ($page) => $page
+                ->component('product/show')
+                ->has('product.images', 2)
+                ->where('product.images.0.url', 'https://example.com/img1.jpg')
+                ->where('product.images.1.url', 'https://example.com/img2.jpg')
+        );
 });
 
 it('handles non-existent product', function () {

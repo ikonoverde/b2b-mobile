@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant U as User
+    participant PC as ProductController
+    participant PS as ProductService
+    participant AC as ApiClient
+    participant API as External API
+
+    U->>PC: GET /products/{id}
+    PC->>PS: getProduct(id)
+    PS->>AC: get("/products/{id}")
+    AC->>API: GET /api/products/{id}
+    API-->>AC: { data: { id, name, image, images[], pricing_tiers[], ... } }
+    AC-->>PS: Response
+    PS-->>PC: array
+    PC-->>U: Inertia::render("product/show", { product })
+
+    Note over U: product/show.tsx renders ImageGallery
+    Note over U: User taps image → opens ImageModal
+    Note over U: ImageModal supports swipe, pinch-to-zoom, dots

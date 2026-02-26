@@ -60,9 +60,19 @@ function fakeProduct(array $overrides = []): array
         'name' => 'Test Product',
         'description' => 'A test product',
         'price' => '100.00',
-        'image_url' => 'https://example.com/image.jpg',
-        'category_id' => 1,
+        'image' => 'https://example.com/image.jpg',
+        'category' => [
+            'id' => 1,
+            'name' => 'Fertilizantes',
+            'slug' => 'fertilizantes',
+            'description' => null,
+            'is_active' => true,
+        ],
         'sku' => 'TEST-001',
+        'images' => [
+            ['id' => 1, 'url' => 'https://example.com/image1.jpg', 'position' => 0],
+            ['id' => 2, 'url' => 'https://example.com/image2.jpg', 'position' => 1],
+        ],
     ], $overrides);
 }
 

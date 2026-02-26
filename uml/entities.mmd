@@ -51,6 +51,7 @@ classDiagram
     }
 
     class ProductController {
+        +show(int id, ProductService) Response
     }
 
     class CartController {
@@ -93,5 +94,6 @@ classDiagram
 
     CatalogController --> ProductService : uses
     CatalogController --> CategoryService : uses
+    ProductController --> ProductService : uses
     ProfileController --> UserService : uses
     PasswordController --> UserService : uses

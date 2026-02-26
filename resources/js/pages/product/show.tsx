@@ -2,8 +2,11 @@ import { Head, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { ImageGallery } from '@/components/products/ImageGallery';
+import { ImageModal } from '@/components/products/ImageModal';
+import { PricingTiers } from '@/components/products/PricingTiers';
 import { formatCurrency } from '@/lib/format';
-import type { Category } from '@/types';
+import type { Category, ProductImage } from '@/types';
 
 interface PricingTier {
     min_quantity: number;
@@ -21,6 +24,7 @@ interface Product {
     sku?: string;
     size?: string;
     pricing_tiers?: PricingTier[];
+    images?: ProductImage[];
 }
 
 interface ProductShowProps {
@@ -31,6 +35,13 @@ export default function ProductShow({ product }: ProductShowProps) {
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(false);
     const [added, setAdded] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalIndex, setModalIndex] = useState(0);
+
+    const images: ProductImage[] = useMemo(
+        () => (product.images?.length ? product.images : [{ id: 0, url: product.image, position: 0 }]),
+        [product.images, product.image],
+    );
 
     const activeTier = useMemo(() => {
         if (!product.pricing_tiers?.length) return null;
@@ -80,12 +91,15 @@ export default function ProductShow({ product }: ProductShowProps) {
                 </button>
             </div>
 
-            {/* Product Image */}
-            <div className="mx-6 mt-3 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.06]">
-                <div className="bg-brand-cream aspect-square overflow-hidden">
-                    <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                </div>
-            </div>
+            {/* Product Image Gallery */}
+            <ImageGallery
+                images={images}
+                productName={product.name}
+                onImageTap={(index) => {
+                    setModalIndex(index);
+                    setModalOpen(true);
+                }}
+            />
 
             {/* Product Info */}
             <div className="flex flex-col gap-1 px-6 pt-5">
@@ -96,42 +110,7 @@ export default function ProductShow({ product }: ProductShowProps) {
             </div>
 
             {/* Pricing Tiers */}
-            {product.pricing_tiers && product.pricing_tiers.length > 0 && (
-                <div className="flex flex-col gap-3 px-6 pt-5">
-                    <h2 className="text-brand-green text-sm font-bold">Precios por Volumen</h2>
-                    <div className="flex flex-col gap-2">
-                        {product.pricing_tiers.map((tier, idx) => {
-                            const isActive = activeTier === tier;
-                            return (
-                                <div
-                                    key={idx}
-                                    className={[
-                                        'flex items-center justify-between rounded-xl px-4 py-3 transition-colors duration-200',
-                                        isActive ? 'bg-brand-green/10 ring-brand-green/30 ring-1' : 'bg-white ring-1 ring-black/[0.06]',
-                                    ].join(' ')}
-                                >
-                                    <div className="flex flex-col">
-                                        <span
-                                            className={['text-[13px] font-semibold', isActive ? 'text-brand-green' : 'text-brand-muted-text'].join(
-                                                ' ',
-                                            )}
-                                        >
-                                            {tier.max_quantity
-                                                ? `${tier.min_quantity} – ${tier.max_quantity} unidades`
-                                                : `${tier.min_quantity}+ unidades`}
-                                        </span>
-                                    </div>
-                                    <span
-                                        className={['text-base font-bold', isActive ? 'text-brand-accent-brown' : 'text-brand-muted-text'].join(' ')}
-                                    >
-                                        {formatCurrency(tier.price)}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
+            {product.pricing_tiers && product.pricing_tiers.length > 0 && <PricingTiers tiers={product.pricing_tiers} activeTier={activeTier} />}
 
             {/* Quantity Selector */}
             <div className="flex flex-col gap-3 px-6 pt-5">
@@ -186,6 +165,9 @@ export default function ProductShow({ product }: ProductShowProps) {
                     )}
                 </button>
             </div>
+
+            {/* Fullscreen Image Modal */}
+            {modalOpen && <ImageModal images={images} initialIndex={modalIndex} onClose={() => setModalOpen(false)} />}
         </>
     );
 }
