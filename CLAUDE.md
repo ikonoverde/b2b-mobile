@@ -287,8 +287,16 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 ## External API
 
 - This app is a thin client that proxies all data through an external API via `ApiClient`.
-- The API's OpenAPI 3.0.3 documentation is available at: `http://192.168.0.193:8000/docs.openapi`
 - Always fetch the latest API docs before implementing features that depend on API endpoints.
+- Use the `fetch-api-docs` skill script to retrieve endpoint details:
+  ```bash
+  # List all endpoints
+  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs
+  # Get specific endpoint details (parameters, request body, responses)
+  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs /api/products /api/categories
+  # Search by keyword
+  node .claude/skills/fetch-api-docs/scripts/fetch-api-docs.mjs --search checkout
+  ```
 
 ## Code quality
 
