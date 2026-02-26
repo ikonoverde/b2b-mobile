@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Building2, ChevronRight, CreditCard, Headphones, LogOut, MapPin, Package, Percent, UserPen, Users } from 'lucide-react';
+import { Building2, ChevronRight, CreditCard, Headphones, Lock, LogOut, MapPin, Package, Percent, UserPen, Users } from 'lucide-react';
 
 import type { Auth } from '@/types/auth';
 
@@ -30,6 +30,7 @@ export default function Account({ profile }: AccountProps) {
 
     const menuItems = [
         { icon: UserPen, label: 'Editar Perfil', href: '/account/profile' },
+        { icon: Lock, label: 'Cambiar Contraseña', href: '/account/password' },
         { icon: CreditCard, label: 'Datos de Facturación', href: '#' },
         { icon: MapPin, label: 'Direcciones de Envío', href: '/account/addresses' },
         { icon: Users, label: 'Usuarios Autorizados', href: '#' },

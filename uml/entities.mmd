@@ -41,6 +41,9 @@ classDiagram
 
     class UserService {
         -ApiClient apiClient
+        +getProfile() array
+        +updateProfile(array data) Response
+        +changePassword(array data) Response
     }
 
     class CatalogController {
@@ -69,6 +72,15 @@ classDiagram
     }
 
     class ProfileController {
+        -UserService userService
+        +edit() Response
+        +update(UpdateProfileRequest) RedirectResponse
+    }
+
+    class PasswordController {
+        -UserService userService
+        +edit() Response
+        +update(ChangePasswordRequest) RedirectResponse
     }
 
     CategoryService --> ApiClient : uses
@@ -81,3 +93,5 @@ classDiagram
 
     CatalogController --> ProductService : uses
     CatalogController --> CategoryService : uses
+    ProfileController --> UserService : uses
+    PasswordController --> UserService : uses

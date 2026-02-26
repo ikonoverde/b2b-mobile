@@ -24,4 +24,12 @@ class UserService
     {
         return $this->apiClient->put('/user', $data);
     }
+
+    /**
+     * @throws ConnectionException
+     */
+    public function changePassword(array $data): Response
+    {
+        return $this->apiClient->put('/password', $data);
+    }
 }

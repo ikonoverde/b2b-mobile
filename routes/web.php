@@ -12,6 +12,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -56,6 +57,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/account/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/account/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('/account/password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/account/password', [PasswordController::class, 'update'])->name('password.change');
 
     Route::get('/account/addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('/account/addresses', [AddressController::class, 'store'])->name('addresses.store');
