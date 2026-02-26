@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant Browser
+    participant CatalogController
+    participant ProductService
+    participant CategoryService
+    participant ApiClient
+    participant ExternalAPI
+
+    Browser->>CatalogController: GET /catalog?page=&category_id=
+
+    CatalogController->>CatalogController: Extract page, category_id from query
+
+    CatalogController->>ProductService: getProducts(page, 15, categoryId)
+    ProductService->>ProductService: Build query (page, per_page, category_id)
+    ProductService->>ApiClient: get("/products", query)
+    ApiClient->>ExternalAPI: GET /api/products?page=&per_page=&category_id[]=
+    ExternalAPI-->>ApiClient: {data, meta, links}
+    ApiClient-->>ProductService: Response
+    ProductService-->>CatalogController: array (data + pagination meta)
+
+    CatalogController->>CatalogController: Build ScrollMetadata from meta
+
+    CatalogController->>CategoryService: getCategories()
+    CategoryService->>ApiClient: get("/categories")
+    ApiClient->>ExternalAPI: GET /api/categories
+    ExternalAPI-->>ApiClient: {data}
+    ApiClient-->>CategoryService: Response
+    CategoryService-->>CatalogController: array (categories)
+
+    CatalogController-->>Browser: Inertia::render("catalog", {products, productsTotal, categories, selectedCategoryId})

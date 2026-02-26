@@ -3,6 +3,7 @@ import { Loader2, PackageOpen, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CatalogProductCard } from '@/components/catalog/CatalogProductCard';
+import { cn } from '@/lib/utils';
 import type { Category } from '@/types';
 
 interface Product {
@@ -18,9 +19,11 @@ interface Product {
 interface CatalogProps {
     products: { data: Product[] };
     productsTotal: number;
+    categories: Category[];
+    selectedCategoryId: number | null;
 }
 
-export default function Catalog({ products, productsTotal }: CatalogProps) {
+export default function Catalog({ products, productsTotal, categories, selectedCategoryId }: CatalogProps) {
     const [search, setSearch] = useState('');
 
     const filtered = useMemo(() => {
@@ -32,6 +35,18 @@ export default function Catalog({ products, productsTotal }: CatalogProps) {
         );
     }, [products.data, search]);
 
+    function handleCategorySelect(categoryId: number | null) {
+        const query: Record<string, string> = {};
+        if (categoryId !== null) {
+            query.category_id = String(categoryId);
+        }
+
+        router.get(window.location.pathname, query, {
+            preserveState: false,
+            preserveScroll: false,
+        });
+    }
+
     function handleSearchChange(value: string) {
         setSearch(value);
 
@@ -42,11 +57,11 @@ export default function Catalog({ products, productsTotal }: CatalogProps) {
 
     return (
         <>
-            <Head title="Catálogo" />
+            <Head title="Catalogo" />
 
             <div className="flex flex-col gap-4 px-6 pb-4 pt-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-brand-green text-xl font-bold">Catálogo</h1>
+                    <h1 className="text-brand-green text-xl font-bold">Catalogo</h1>
                     <span className="text-brand-muted-text text-[13px] font-medium">
                         {search ? filtered.length : productsTotal} {(search ? filtered.length : productsTotal) === 1 ? 'producto' : 'productos'}
                     </span>
@@ -59,7 +74,7 @@ export default function Catalog({ products, productsTotal }: CatalogProps) {
                         type="text"
                         value={search}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        placeholder="Buscar producto, categoría o SKU..."
+                        placeholder="Buscar producto, categoria o SKU..."
                         className="text-brand-green placeholder:text-brand-muted-green/60 focus:ring-brand-green/30 w-full rounded-xl border-0 bg-white py-2.5 pl-9 pr-9 text-sm shadow-sm ring-1 ring-black/[0.06] focus:outline-none focus:ring-2"
                     />
                     {search && (
@@ -68,6 +83,39 @@ export default function Catalog({ products, productsTotal }: CatalogProps) {
                         </button>
                     )}
                 </div>
+
+                {/* Category Tabs */}
+                {categories.length > 0 && (
+                    <div className="-mx-6 overflow-x-auto px-6">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleCategorySelect(null)}
+                                className={cn(
+                                    'shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                                    selectedCategoryId === null
+                                        ? 'bg-brand-light-green text-brand-green'
+                                        : 'text-brand-muted-text bg-white shadow-sm ring-1 ring-black/[0.06]',
+                                )}
+                            >
+                                Todos
+                            </button>
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => handleCategorySelect(category.id)}
+                                    className={cn(
+                                        'shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                                        selectedCategoryId === category.id
+                                            ? 'bg-brand-light-green text-brand-green'
+                                            : 'text-brand-muted-text bg-white shadow-sm ring-1 ring-black/[0.06]',
+                                    )}
+                                >
+                                    {category.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Product Grid */}

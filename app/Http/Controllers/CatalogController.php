@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
@@ -17,9 +18,16 @@ class CatalogController extends Controller
     public function __invoke(
         Request $request,
         ProductService $productService,
+        CategoryService $categoryService,
     ): Response {
         $page = (int) $request->query('page', 1);
-        $response = $productService->getProducts(page: $page, perPage: 15);
+        $categoryId = $request->query('category_id');
+
+        $response = $productService->getProducts(
+            page: $page,
+            perPage: 15,
+            categoryId: $categoryId ? [(int) $categoryId] : null,
+        );
 
         $meta = $response['meta'] ?? [];
         $currentPage = $meta['current_page'] ?? 1;
@@ -39,9 +47,13 @@ class CatalogController extends Controller
             metadata: $metadata,
         );
 
+        $categories = $categoryService->getCategories();
+
         return Inertia::render('catalog', [
             'products' => $products,
             'productsTotal' => $total,
+            'categories' => $categories['data'] ?? [],
+            'selectedCategoryId' => $categoryId ? (int) $categoryId : null,
         ]);
     }
 }

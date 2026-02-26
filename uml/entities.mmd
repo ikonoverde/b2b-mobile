@@ -1,0 +1,83 @@
+classDiagram
+    class ApiClient {
+        +register(array data) array
+        +login(array data) array
+        +get(string endpoint, array query) Response
+        +post(string endpoint, array data) Response
+        +put(string endpoint, array data) Response
+        +delete(string endpoint) Response
+        +forgotPassword(array data) Response
+        +request() PendingRequest
+        +authenticated() PendingRequest
+    }
+
+    class CategoryService {
+        -ApiClient apiClient
+        +getCategories() array
+    }
+
+    class ProductService {
+        -ApiClient apiClient
+        +getFeaturedProducts() array
+        +getProducts(int page, int perPage, ?array categoryId) array
+        +getProduct(int id) array
+    }
+
+    class CartService {
+        -ApiClient apiClient
+    }
+
+    class OrderService {
+        -ApiClient apiClient
+    }
+
+    class AddressService {
+        -ApiClient apiClient
+    }
+
+    class CheckoutService {
+        -ApiClient apiClient
+    }
+
+    class UserService {
+        -ApiClient apiClient
+    }
+
+    class CatalogController {
+        +__invoke(Request, ProductService, CategoryService) Response
+    }
+
+    class ProductController {
+    }
+
+    class CartController {
+    }
+
+    class OrderController {
+    }
+
+    class AddressController {
+    }
+
+    class CheckoutController {
+    }
+
+    class DashboardController {
+    }
+
+    class HomeController {
+    }
+
+    class ProfileController {
+    }
+
+    CategoryService --> ApiClient : uses
+    ProductService --> ApiClient : uses
+    CartService --> ApiClient : uses
+    OrderService --> ApiClient : uses
+    AddressService --> ApiClient : uses
+    CheckoutService --> ApiClient : uses
+    UserService --> ApiClient : uses
+
+    CatalogController --> ProductService : uses
+    CatalogController --> CategoryService : uses
