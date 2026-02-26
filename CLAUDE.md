@@ -303,3 +303,12 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
     - Max accepted cyclo: 15
     - Max accepted cognitive/complex: 20
     - Refactor anything above those limits to lower the complexity
+
+
+## Application shape
+
+To have a better understanding of the application current state we will maintain uml diagrams in mermaidjs format
+
+- Use git to get the current changes
+- Only consider changes from app/
+- Before finish and after quality checks, ALWAYS update 
