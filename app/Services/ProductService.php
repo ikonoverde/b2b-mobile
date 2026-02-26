@@ -19,9 +19,12 @@ class ProductService
     /**
      * @throws ConnectionException
      */
-    public function getProducts(): array
+    public function getProducts(int $page = 1, int $perPage = 15): array
     {
-        return $this->apiClient->get('/products')->json();
+        return $this->apiClient->get(
+            '/products',
+            ['page' => $page, 'per_page' => $perPage],
+        )->json();
     }
 
     /**
