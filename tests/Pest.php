@@ -1,14 +1,12 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Http;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
 |--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "pest()" function to bind a different classes or traits.
-|
 */
 
 pest()->extend(Tests\TestCase::class)
@@ -17,31 +15,97 @@ pest()->extend(Tests\TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
-| Expectations
+| Helpers
 |--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
-
-function something()
+/**
+ * Set up Http::fake with a default empty cart response (needed for the
+ * HandleInertiaRequests middleware's cartItemCount on authenticated routes)
+ * plus any test-specific overrides.
+ */
+function fakeApiResponses(array $overrides = []): void
 {
-    // ..
+    Http::fake(array_merge([
+        'https://api.test/api/cart' => Http::response([
+            'data' => [
+                'items' => [],
+                'totals' => ['subtotal' => 0, 'shipping' => 0, 'total' => 0],
+            ],
+        ]),
+    ], $overrides));
+}
+
+/**
+ * Create and authenticate a user with API session data.
+ */
+function authenticatedUser(array $attributes = []): User
+{
+    $user = User::factory()->create($attributes);
+
+    test()->actingAs($user)
+        ->withSession([
+            'api_token' => 'test-token',
+            'api_user' => $user->toArray(),
+        ]);
+
+    return $user;
+}
+
+/** Build a fake product array. */
+function fakeProduct(array $overrides = []): array
+{
+    return array_merge([
+        'id' => 1,
+        'name' => 'Test Product',
+        'description' => 'A test product',
+        'price' => '100.00',
+        'image_url' => 'https://example.com/image.jpg',
+        'category_id' => 1,
+        'sku' => 'TEST-001',
+    ], $overrides);
+}
+
+/** Build a fake cart API response. */
+function fakeCartResponse(array $items = [], array $totals = []): array
+{
+    return [
+        'data' => [
+            'items' => $items,
+            'totals' => array_merge([
+                'subtotal' => 0,
+                'shipping' => 0,
+                'total' => 0,
+            ], $totals),
+        ],
+    ];
+}
+
+/** Build a fake address array. */
+function fakeAddress(array $overrides = []): array
+{
+    return array_merge([
+        'id' => 1,
+        'label' => 'Casa',
+        'name' => 'Juan Pérez',
+        'address_line_1' => 'Calle Principal 123',
+        'address_line_2' => null,
+        'city' => 'Ciudad de México',
+        'state' => 'CDMX',
+        'postal_code' => '01000',
+        'phone' => '5551234567',
+        'is_default' => true,
+    ], $overrides);
+}
+
+/** Build a fake order array. */
+function fakeOrder(array $overrides = []): array
+{
+    return array_merge([
+        'id' => 1,
+        'status' => 'pending',
+        'total' => '500.00',
+        'created_at' => '2026-01-15T10:00:00Z',
+        'items' => [],
+    ], $overrides);
 }
