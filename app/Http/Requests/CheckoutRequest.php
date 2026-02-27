@@ -29,6 +29,7 @@ class CheckoutRequest extends FormRequest
             'state' => ['required', 'string', 'max:255'],
             'postal_code' => ['required', 'string', 'max:10'],
             'phone' => ['required', 'string', 'max:20'],
+            'shipping_method_id' => ['required', 'integer'],
         ];
     }
 
@@ -46,6 +47,8 @@ class CheckoutRequest extends FormRequest
             'state.required' => 'El estado es obligatorio.',
             'postal_code.required' => 'El código postal es obligatorio.',
             'phone.required' => 'El teléfono es obligatorio.',
+            'shipping_method_id.required' => 'El método de envío es obligatorio.',
+            'shipping_method_id.integer' => 'El método de envío seleccionado no es válido.',
         ];
     }
 }

@@ -108,6 +108,18 @@ function fakeAddress(array $overrides = []): array
     ], $overrides);
 }
 
+/** Build a fake shipping method array. */
+function fakeShippingMethod(array $overrides = []): array
+{
+    return array_merge([
+        'id' => 1,
+        'name' => 'Envio Estandar',
+        'description' => 'Entrega en 5-7 dias habiles',
+        'cost' => 99.00,
+        'estimated_delivery_days' => 7,
+    ], $overrides);
+}
+
 /** Build a fake order array. */
 function fakeOrder(array $overrides = []): array
 {

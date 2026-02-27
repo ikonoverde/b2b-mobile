@@ -6,6 +6,7 @@ use App\Http\Requests\CheckoutRequest;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\ShippingMethodService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,7 @@ class CheckoutController extends Controller
         private readonly AddressService $addressService,
         private readonly CartService $cartService,
         private readonly CheckoutService $checkoutService,
+        private readonly ShippingMethodService $shippingMethodService,
     ) {}
 
     /**
@@ -35,9 +37,16 @@ class CheckoutController extends Controller
             $savedAddresses = [];
         }
 
+        try {
+            $shippingMethods = $this->shippingMethodService->getShippingMethods();
+        } catch (ConnectionException) {
+            $shippingMethods = [];
+        }
+
         return Inertia::render('checkout', [
             'cart' => $cart['data'] ?? ['items' => [], 'totals' => ['subtotal' => 0, 'shipping' => 0, 'total' => 0]],
             'savedAddresses' => $savedAddresses,
+            'shippingMethods' => $shippingMethods,
         ]);
     }
 
@@ -60,6 +69,7 @@ class CheckoutController extends Controller
                 'zip' => $validated['postal_code'],
                 'country' => 'MX',
             ],
+            'shipping_method_id' => $validated['shipping_method_id'],
             'success_url' => $apiBaseUrl.
                 '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => $apiBaseUrl.'/checkout/cancel',

@@ -4,21 +4,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { TextInput } from '@/components/form/TextInput';
 import { formatCurrency } from '@/lib/format';
-import type { Address } from '@/types';
+import type { Address, ShippingMethod } from '@/types';
 import type { Cart } from '@/types/cart';
 import type { Order } from '@/types/order';
 
-type Step = 'shipping' | 'payment' | 'success';
+type Step = 'shipping' | 'shippingMethod' | 'payment' | 'success';
 
 interface CheckoutProps {
     cart: Cart;
     savedAddresses?: Address[];
+    shippingMethods?: ShippingMethod[];
     checkoutUrl?: string;
     order?: Order;
 }
 
 const steps = [
     { key: 'shipping' as const, label: 'Envio', icon: Truck },
+    { key: 'shippingMethod' as const, label: 'Metodo', icon: Package },
     { key: 'payment' as const, label: 'Pago', icon: CreditCard },
     { key: 'success' as const, label: 'Listo', icon: CheckCircle },
 ];
@@ -65,7 +67,10 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
     );
 }
 
-function OrderSummary({ cart }: { cart: Cart }) {
+function OrderSummary({ cart, shippingCost }: { cart: Cart; shippingCost?: number }) {
+    const shipping = shippingCost ?? cart.totals.shipping;
+    const total = cart.totals.subtotal + shipping;
+
     return (
         <div className="mx-6 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
             <h2 className="text-brand-green text-sm font-bold">Resumen ({cart.items.length} productos)</h2>
@@ -85,13 +90,103 @@ function OrderSummary({ cart }: { cart: Cart }) {
                     </div>
                     <div className="flex justify-between text-sm">
                         <span className="text-brand-muted-text">Envio</span>
-                        <span className="text-brand-green font-medium">{formatCurrency(cart.totals.shipping)}</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(shipping)}</span>
                     </div>
                     <div className="mt-1 flex justify-between">
                         <span className="text-brand-green text-sm font-bold">Total</span>
-                        <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(cart.totals.total)}</span>
+                        <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(total)}</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+function ShippingMethodStep({
+    methods,
+    selectedId,
+    onSelect,
+    onBack,
+    onSubmit,
+    processing,
+    error,
+}: {
+    methods: ShippingMethod[];
+    selectedId: number | null;
+    onSelect: (id: number) => void;
+    onBack: () => void;
+    onSubmit: () => void;
+    processing: boolean;
+    error?: string;
+}) {
+    return (
+        <div className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
+            <h2 className="text-brand-green text-sm font-bold">Metodo de Envio</h2>
+
+            {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+
+            {methods.length === 0 ? (
+                <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-black/[0.06]">
+                    <p className="text-brand-muted-text text-sm">No hay metodos de envio disponibles.</p>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-2.5">
+                    {methods.map((method) => {
+                        const isSelected = selectedId === method.id;
+
+                        return (
+                            <button
+                                key={method.id}
+                                type="button"
+                                onClick={() => onSelect(method.id)}
+                                className={`flex items-start gap-3 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 transition-colors ${
+                                    isSelected ? 'ring-brand-green ring-2' : 'ring-black/[0.06] active:bg-gray-50'
+                                }`}
+                            >
+                                <div
+                                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                                        isSelected ? 'border-brand-green bg-brand-green' : 'border-gray-300'
+                                    }`}
+                                >
+                                    {isSelected && <Check className="h-3 w-3 text-white" />}
+                                </div>
+                                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-brand-green text-sm font-bold">{method.name}</span>
+                                        <span className="text-brand-accent-brown text-sm font-bold">{formatCurrency(method.cost)}</span>
+                                    </div>
+                                    <span className="text-brand-muted-text text-[13px] leading-relaxed">{method.description}</span>
+                                    <div className="flex items-center gap-1.5 pt-0.5">
+                                        <Truck className="text-brand-muted-green h-3.5 w-3.5" />
+                                        <span className="text-brand-muted-text text-[13px]">
+                                            {method.estimated_delivery_days === 1
+                                                ? '1 dia habil'
+                                                : `${method.estimated_delivery_days} dias habiles`}
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+
+            <div className="flex gap-3">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="flex h-14 flex-1 items-center justify-center rounded-2xl font-bold text-gray-500 ring-1 ring-black/[0.06]"
+                >
+                    Atras
+                </button>
+                <button
+                    type="button"
+                    onClick={onSubmit}
+                    disabled={processing || !selectedId}
+                    className="bg-brand-green flex h-14 flex-[2] items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
+                >
+                    {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continuar al Pago'}
+                </button>
             </div>
         </div>
     );
@@ -246,11 +341,12 @@ function SuccessStep() {
     );
 }
 
-export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: CheckoutProps) {
+export default function Checkout({ cart, savedAddresses = [], shippingMethods = [], checkoutUrl }: CheckoutProps) {
     const [step, setStep] = useState<Step>('shipping');
     const hasAddresses = savedAddresses.length > 0;
     const defaultAddress = savedAddresses.find((a) => a.is_default);
     const [selectedAddressId, setSelectedAddressId] = useState<number | 'new' | null>(defaultAddress?.id ?? (hasAddresses ? null : 'new'));
+    const [selectedMethodId, setSelectedMethodId] = useState<number | null>(null);
 
     const form = useForm({
         name: '',
@@ -260,9 +356,18 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
         state: '',
         postal_code: '',
         phone: '',
+        shipping_method_id: 0,
     });
 
     const pageErrors = usePage().props.errors as Record<string, string>;
+
+    // Auto-select shipping method when only one exists (UC-023 A1)
+    useEffect(() => {
+        if (shippingMethods.length === 1 && !selectedMethodId) {
+            selectShippingMethod(shippingMethods[0].id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [shippingMethods]);
 
     useEffect(() => {
         if (checkoutUrl) {
@@ -275,7 +380,8 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
             const address = savedAddresses.find((a) => a.id === selectedAddressId);
 
             if (address) {
-                form.setData({
+                form.setData((prev) => ({
+                    ...prev,
                     name: address.name,
                     address_line_1: address.address_line_1,
                     address_line_2: address.address_line_2 ?? '',
@@ -283,10 +389,11 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
                     state: address.state,
                     postal_code: address.postal_code,
                     phone: address.phone,
-                });
+                }));
             }
         } else if (selectedAddressId === 'new') {
-            form.setData({
+            form.setData((prev) => ({
+                ...prev,
                 name: '',
                 address_line_1: '',
                 address_line_2: '',
@@ -294,15 +401,26 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
                 state: '',
                 postal_code: '',
                 phone: '',
-            });
+            }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedAddressId]);
 
     const showManualForm = selectedAddressId === 'new' || !hasAddresses;
+    const selectedMethod = shippingMethods.find((m) => m.id === selectedMethodId);
 
     function submitShipping(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setStep('shippingMethod');
+    }
+
+    function selectShippingMethod(id: number) {
+        setSelectedMethodId(id);
+        form.setData('shipping_method_id', id);
+    }
+
+    function submitShippingMethod() {
+        if (!selectedMethodId) return;
         form.post('/checkout');
     }
 
@@ -312,7 +430,7 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
 
             <StepIndicator currentStep={step} />
 
-            {step !== 'success' && <OrderSummary cart={cart} />}
+            {step !== 'success' && <OrderSummary cart={cart} shippingCost={selectedMethod?.cost} />}
 
             {step === 'shipping' && (
                 <form onSubmit={submitShipping} className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
@@ -401,9 +519,21 @@ export default function Checkout({ cart, savedAddresses = [], checkoutUrl }: Che
                         disabled={form.processing || selectedAddressId === null}
                         className="bg-brand-green flex h-14 items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
                     >
-                        {form.processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continuar al Pago'}
+                        {form.processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Seleccionar Metodo de Envio'}
                     </button>
                 </form>
+            )}
+
+            {step === 'shippingMethod' && (
+                <ShippingMethodStep
+                    methods={shippingMethods}
+                    selectedId={selectedMethodId}
+                    onSelect={selectShippingMethod}
+                    onBack={() => setStep('shipping')}
+                    onSubmit={submitShippingMethod}
+                    processing={form.processing}
+                    error={pageErrors.checkout}
+                />
             )}
 
             {step === 'payment' && checkoutUrl && (
