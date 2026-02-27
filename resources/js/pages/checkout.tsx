@@ -68,7 +68,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 }
 
 function OrderSummary({ cart, shippingCost }: { cart: Cart; shippingCost?: number }) {
-    const shipping = shippingCost ?? cart.totals.shipping;
+    const shipping = shippingCost ?? cart.totals.shipping ?? 0;
     const total = cart.totals.subtotal + shipping;
 
     return (
