@@ -1,5 +1,5 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { Check, CheckCircle, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Plus, Truck, User } from 'lucide-react';
+import { Check, CheckCircle, ClipboardList, CreditCard, ExternalLink, Loader2, MapPin, Package, Phone, Plus, Truck, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { TextInput } from '@/components/form/TextInput';
@@ -8,7 +8,7 @@ import type { Address, ShippingMethod } from '@/types';
 import type { Cart } from '@/types/cart';
 import type { Order } from '@/types/order';
 
-type Step = 'shipping' | 'shippingMethod' | 'payment' | 'success';
+type Step = 'shipping' | 'shippingMethod' | 'review' | 'payment' | 'success';
 
 interface CheckoutProps {
     cart: Cart;
@@ -21,6 +21,7 @@ interface CheckoutProps {
 const steps = [
     { key: 'shipping' as const, label: 'Envio', icon: Truck },
     { key: 'shippingMethod' as const, label: 'Metodo', icon: Package },
+    { key: 'review' as const, label: 'Revisar', icon: ClipboardList },
     { key: 'payment' as const, label: 'Pago', icon: CreditCard },
     { key: 'success' as const, label: 'Listo', icon: CheckCircle },
 ];
@@ -185,7 +186,7 @@ function ShippingMethodStep({
                     disabled={processing || !selectedId}
                     className="bg-brand-green flex h-14 flex-[2] items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
                 >
-                    {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continuar al Pago'}
+                    {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Revisar Pedido'}
                 </button>
             </div>
         </div>
@@ -266,6 +267,129 @@ function SavedAddressPicker({
                 <Plus className="h-4 w-4" />
                 Ingresar nueva direccion
             </button>
+        </div>
+    );
+}
+
+function ReviewStep({
+    cart,
+    shippingAddress,
+    shippingMethod,
+    onBack,
+    onSubmit,
+    processing,
+}: {
+    cart: Cart;
+    shippingAddress: { name: string; address_line_1: string; address_line_2: string; city: string; state: string; postal_code: string; phone: string };
+    shippingMethod: ShippingMethod;
+    onBack: () => void;
+    onSubmit: () => void;
+    processing: boolean;
+}) {
+    const shipping = shippingMethod.cost;
+    const total = cart.totals.subtotal + shipping;
+
+    return (
+        <div className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
+            <h2 className="text-brand-green text-sm font-bold">Revisar Pedido</h2>
+
+            {/* Cart items */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
+                <h3 className="text-brand-green mb-3 text-xs font-bold uppercase tracking-wide">Productos</h3>
+                <div className="flex flex-col gap-2.5">
+                    {cart.items.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between">
+                            <div className="flex min-w-0 flex-1 flex-col">
+                                <span className="text-brand-green truncate text-sm font-medium">{item.name}</span>
+                                <span className="text-brand-muted-text text-xs">
+                                    {item.quantity} x {formatCurrency(item.price)}
+                                </span>
+                            </div>
+                            <span className="text-brand-green ml-3 shrink-0 text-sm font-bold">{formatCurrency(item.subtotal)}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Cost breakdown */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
+                <h3 className="text-brand-green mb-3 text-xs font-bold uppercase tracking-wide">Costos</h3>
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between text-sm">
+                        <span className="text-brand-muted-text">Subtotal</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(cart.totals.subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                        <span className="text-brand-muted-text">Envio</span>
+                        <span className="text-brand-green font-medium">{formatCurrency(shipping)}</span>
+                    </div>
+                    <div className="mt-1 flex justify-between border-t border-black/[0.06] pt-2">
+                        <span className="text-brand-green text-sm font-bold">Total</span>
+                        <span className="text-brand-accent-brown text-base font-bold">{formatCurrency(total)}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Shipping address */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
+                <h3 className="text-brand-green mb-3 text-xs font-bold uppercase tracking-wide">Direccion de Envio</h3>
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
+                        <User className="text-brand-muted-green h-3.5 w-3.5" />
+                        <span className="text-brand-green text-sm font-medium">{shippingAddress.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <MapPin className="text-brand-muted-green h-3.5 w-3.5" />
+                        <span className="text-brand-muted-text text-[13px]">
+                            {shippingAddress.address_line_1}
+                            {shippingAddress.address_line_2 && `, ${shippingAddress.address_line_2}`},{' '}
+                            {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <Phone className="text-brand-muted-green h-3.5 w-3.5" />
+                        <span className="text-brand-muted-text text-[13px]">{shippingAddress.phone}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Shipping method */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/[0.06]">
+                <h3 className="text-brand-green mb-3 text-xs font-bold uppercase tracking-wide">Metodo de Envio</h3>
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                        <span className="text-brand-green text-sm font-bold">{shippingMethod.name}</span>
+                        <span className="text-brand-accent-brown text-sm font-bold">{formatCurrency(shippingMethod.cost)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <Truck className="text-brand-muted-green h-3.5 w-3.5" />
+                        <span className="text-brand-muted-text text-[13px]">
+                            {shippingMethod.estimated_delivery_days === 1
+                                ? '1 dia habil'
+                                : `${shippingMethod.estimated_delivery_days} dias habiles`}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3">
+                <button
+                    type="button"
+                    onClick={onBack}
+                    className="flex h-14 flex-1 items-center justify-center rounded-2xl font-bold text-gray-500 ring-1 ring-black/[0.06]"
+                >
+                    Atras
+                </button>
+                <button
+                    type="button"
+                    onClick={onSubmit}
+                    disabled={processing}
+                    className="bg-brand-green flex h-14 flex-[2] items-center justify-center rounded-2xl font-bold text-white disabled:opacity-70"
+                >
+                    {processing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Proceder al Pago'}
+                </button>
+            </div>
         </div>
     );
 }
@@ -421,6 +545,10 @@ export default function Checkout({ cart, savedAddresses = [], shippingMethods = 
 
     function submitShippingMethod() {
         if (!selectedMethodId) return;
+        setStep('review');
+    }
+
+    function submitReview() {
         form.post('/checkout');
     }
 
@@ -430,7 +558,7 @@ export default function Checkout({ cart, savedAddresses = [], shippingMethods = 
 
             <StepIndicator currentStep={step} />
 
-            {step !== 'success' && <OrderSummary cart={cart} shippingCost={selectedMethod?.cost} />}
+            {step !== 'success' && step !== 'review' && <OrderSummary cart={cart} shippingCost={selectedMethod?.cost} />}
 
             {step === 'shipping' && (
                 <form onSubmit={submitShipping} className="flex flex-col gap-3.5 px-6 pb-6 pt-5">
@@ -533,6 +661,17 @@ export default function Checkout({ cart, savedAddresses = [], shippingMethods = 
                     onSubmit={submitShippingMethod}
                     processing={form.processing}
                     error={pageErrors.checkout}
+                />
+            )}
+
+            {step === 'review' && selectedMethod && (
+                <ReviewStep
+                    cart={cart}
+                    shippingAddress={form.data}
+                    shippingMethod={selectedMethod}
+                    onBack={() => setStep('shippingMethod')}
+                    onSubmit={submitReview}
+                    processing={form.processing}
                 />
             )}
 
