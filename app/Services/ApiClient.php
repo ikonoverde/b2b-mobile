@@ -80,6 +80,16 @@ class ApiClient
     }
 
     /**
+     * Reset password with token.
+     *
+     * @throws ConnectionException
+     */
+    public function resetPassword(array $data): Response
+    {
+        return $this->request()->post('/password/reset/confirm', $data);
+    }
+
+    /**
      * Create a base request to the API.
      */
     public function request(): PendingRequest

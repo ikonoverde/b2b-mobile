@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
@@ -33,6 +34,9 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
+
+    Route::get('/reset-password', [ResetPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
