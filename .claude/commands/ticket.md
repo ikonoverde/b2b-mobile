@@ -5,7 +5,7 @@ model: opus
 
 ## Flow:
 
-1. Move the GitHub issue to In progress
+1. **Move the GitHub issue to In progress**
 2. Fetch the GitHub issue details
     - If the ticket references Requirements (prefix `REQ`, e.g. "REQ 1.5") or Use Cases (prefix `UC`, e.g. "UC-011"), use the `fetch-requirements` skill to retrieve their full details for additional context before planning
 3. Check if any API dependencies are needed
