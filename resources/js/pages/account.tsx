@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Building2, ChevronRight, CreditCard, Headphones, Lock, LogOut, MapPin, Package, Percent, UserPen, Users } from 'lucide-react';
+import { Building2, ChevronRight, CreditCard, Headphones, Lock, LogOut, MapPin, Package, Percent, UserPen } from 'lucide-react';
 
 import type { Auth } from '@/types/auth';
 
@@ -31,9 +31,9 @@ export default function Account({ profile }: AccountProps) {
     const menuItems = [
         { icon: UserPen, label: 'Editar Perfil', href: '/account/profile' },
         { icon: Lock, label: 'Cambiar Contraseña', href: '/account/password' },
+        { icon: Package, label: 'Historial de Pedidos', href: '/orders' },
         { icon: CreditCard, label: 'Datos de Facturación', href: '#' },
         { icon: MapPin, label: 'Direcciones de Envío', href: '/account/addresses' },
-        { icon: Users, label: 'Usuarios Autorizados', href: '#' },
         { icon: Headphones, label: 'Soporte Comercial', href: '#' },
     ];
 
@@ -55,11 +55,14 @@ export default function Account({ profile }: AccountProps) {
 
             {/* Stats */}
             <div className="flex gap-2 px-6">
-                <div className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/[0.06]">
+                <button
+                    onClick={() => router.visit('/orders')}
+                    className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/[0.06] transition-colors active:bg-brand-cream"
+                >
                     <Package className="text-brand-green h-5 w-5" />
                     <span className="text-brand-green text-lg font-bold">{profile.orders_count ?? 0}</span>
                     <span className="text-brand-muted-text text-[10px] font-medium">Pedidos</span>
-                </div>
+                </button>
                 <div className="flex flex-1 flex-col items-center gap-1 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/[0.06]">
                     <Building2 className="text-brand-accent-brown h-5 w-5" />
                     <span className="text-brand-accent-brown text-lg font-bold">{profile.total_spent ?? 0}</span>

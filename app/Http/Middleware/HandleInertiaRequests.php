@@ -44,6 +44,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
+                'reorderUnavailable' => fn () => $request->session()->get('reorder_unavailable'),
+                'reorderPriceChanges' => fn () => $request->session()->get('reorder_price_changes'),
             ],
             'cartItemCount' => fn () => $request->user()
                 ? rescue(fn () => count(app(CartService::class)->getCart()['data']['items'] ?? []), 0)

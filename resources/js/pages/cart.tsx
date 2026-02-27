@@ -1,5 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { ShoppingCart, Trash2 } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { AlertTriangle, Info, ShoppingCart, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
 
 import { CartItemCard } from '@/components/cart/CartItemCard';
 import { formatCurrency } from '@/lib/format';
@@ -11,6 +12,9 @@ interface CartPageProps {
 
 export default function CartPage({ cart }: CartPageProps) {
     const isEmpty = cart.items.length === 0;
+    const { flash } = usePage().props;
+    const [showUnavailable, setShowUnavailable] = useState(true);
+    const [showPriceChanges, setShowPriceChanges] = useState(true);
 
     function clearCart() {
         if (!confirm('¿Vaciar todo el carrito?')) return;
@@ -35,6 +39,45 @@ export default function CartPage({ cart }: CartPageProps) {
                     )}
                 </div>
             </div>
+
+            {/* Reorder Notifications */}
+            {flash.reorderUnavailable && showUnavailable && (
+                <div className="mx-6 mb-2 flex items-start gap-3 rounded-xl bg-amber-50 p-3 ring-1 ring-amber-200">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                    <div className="flex-1">
+                        <p className="text-xs font-semibold text-amber-800">Algunos productos no están disponibles</p>
+                        <ul className="mt-1 flex flex-col gap-0.5">
+                            {flash.reorderUnavailable.map((item) => (
+                                <li key={item.product_id} className="text-xs text-amber-700">
+                                    {item.product_name} — {item.reason}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <button onClick={() => setShowUnavailable(false)} className="shrink-0 p-0.5 text-amber-400 active:text-amber-600">
+                        <X className="h-4 w-4" />
+                    </button>
+                </div>
+            )}
+
+            {flash.reorderPriceChanges && showPriceChanges && (
+                <div className="mx-6 mb-2 flex items-start gap-3 rounded-xl bg-blue-50 p-3 ring-1 ring-blue-200">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                    <div className="flex-1">
+                        <p className="text-xs font-semibold text-blue-800">Algunos precios han cambiado</p>
+                        <ul className="mt-1 flex flex-col gap-0.5">
+                            {flash.reorderPriceChanges.map((item) => (
+                                <li key={item.product_id} className="text-xs text-blue-700">
+                                    {item.product_name}: {formatCurrency(item.original_price)} → {formatCurrency(item.current_price)}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <button onClick={() => setShowPriceChanges(false)} className="shrink-0 p-0.5 text-blue-400 active:text-blue-600">
+                        <X className="h-4 w-4" />
+                    </button>
+                </div>
+            )}
 
             {isEmpty ? (
                 <div className="flex flex-col items-center gap-4 px-6 py-12">

@@ -14,7 +14,16 @@ declare module '@inertiajs/core' {
             auth: Auth;
             cartItemCount: number;
             sidebarOpen: boolean;
-            flash: { status: string | null };
+            flash: {
+                status: string | null;
+                reorderUnavailable: { product_id: number; product_name: string; reason: string }[] | null;
+                reorderPriceChanges: {
+                    product_id: number;
+                    product_name: string;
+                    original_price: number;
+                    current_price: number;
+                }[] | null;
+            };
             [key: string]: unknown;
         };
     }

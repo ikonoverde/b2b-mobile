@@ -1,5 +1,5 @@
-import { Head, InfiniteScroll, Link } from '@inertiajs/react';
-import { ChevronDown, ClipboardList, Loader2, MapPin, Package } from 'lucide-react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
+import { ChevronDown, ClipboardList, Loader2, MapPin, Package, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 import { formatCurrency } from '@/lib/format';
@@ -33,9 +33,17 @@ function formatDate(dateString: string): string {
 
 function OrderCard({ order }: { order: Order }) {
     const [expanded, setExpanded] = useState(false);
+    const [reordering, setReordering] = useState(false);
     const status = getStatus(order.status);
     const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = order.total_amount - order.shipping_cost;
+
+    function handleReorder() {
+        router.post(`/orders/${order.id}/reorder`, {}, {
+            onStart: () => setReordering(true),
+            onFinish: () => setReordering(false),
+        });
+    }
 
     return (
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.06]">
@@ -121,6 +129,20 @@ function OrderCard({ order }: { order: Order }) {
                                 <span className="text-brand-accent-brown text-sm font-bold">{formatCurrency(order.total_amount)}</span>
                             </div>
                         </div>
+
+                        {/* Reorder Button */}
+                        <button
+                            onClick={handleReorder}
+                            disabled={reordering}
+                            className="bg-brand-green mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-60"
+                        >
+                            {reordering ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <RefreshCw className="h-4 w-4" />
+                            )}
+                            Volver a Pedir
+                        </button>
                     </div>
                 </div>
             </div>

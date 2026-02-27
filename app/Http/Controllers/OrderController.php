@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\OrderService;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -48,5 +49,31 @@ class OrderController extends Controller
             'orders' => $orders,
             'ordersTotal' => $total,
         ]);
+    }
+
+    /**
+     * Reorder all items from a previous order into the cart.
+     */
+    public function reorder(int $order): RedirectResponse
+    {
+        try {
+            $response = $this->orderService->reorder($order);
+        } catch (ConnectionException) {
+            return redirect()->route('orders')->withErrors(['reorder' => 'No se pudo conectar con el servidor.']);
+        }
+
+        if (! $response->successful()) {
+            return redirect()->route('orders')->withErrors(['reorder' => 'No se pudo realizar el pedido nuevamente.']);
+        }
+
+        $data = $response->json('data', []);
+
+        $unavailable = $data['unavailable'] ?? [];
+        $priceChanges = $data['price_changes'] ?? [];
+
+        return redirect()->route('cart')
+            ->with('status', 'reorder_success')
+            ->with('reorder_unavailable', ! empty($unavailable) ? $unavailable : null)
+            ->with('reorder_price_changes', ! empty($priceChanges) ? $priceChanges : null);
     }
 }

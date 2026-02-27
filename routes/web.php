@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/account', AccountController::class)->name('account');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder'])->name('orders.reorder');
 
     Route::get('/account/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/account/profile', [ProfileController::class, 'update'])->name('profile.update');

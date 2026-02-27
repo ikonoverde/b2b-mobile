@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Response;
 
 class OrderService
 {
@@ -25,5 +26,15 @@ class OrderService
     public function getOrder(int $id): array
     {
         return $this->apiClient->get("/orders/{$id}")->json();
+    }
+
+    /**
+     * Reorder all items from a previous order.
+     *
+     * @throws ConnectionException
+     */
+    public function reorder(int $orderId): Response
+    {
+        return $this->apiClient->post("/orders/{$orderId}/reorder");
     }
 }
