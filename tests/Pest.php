@@ -76,6 +76,18 @@ function fakeProduct(array $overrides = []): array
     ], $overrides);
 }
 
+/** Build a fake category array. */
+function fakeCategory(array $overrides = []): array
+{
+    return array_merge([
+        'id' => 1,
+        'name' => 'Fertilizantes',
+        'slug' => 'fertilizantes',
+        'description' => null,
+        'is_active' => true,
+    ], $overrides);
+}
+
 /** Build a fake cart API response. */
 function fakeCartResponse(array $items = [], array $totals = []): array
 {

@@ -22,9 +22,10 @@ interface Profile {
 interface DashboardProps {
     featuredProducts: Product[];
     profile: Profile;
+    categories: Category[];
 }
 
-export default function Dashboard({ featuredProducts, profile }: DashboardProps) {
+export default function Dashboard({ featuredProducts, profile, categories }: DashboardProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
     return (
@@ -76,6 +77,26 @@ export default function Dashboard({ featuredProducts, profile }: DashboardProps)
                     </Link>
                 </div>
             </div>
+
+            {/* Categories */}
+            {categories.length > 0 && (
+                <div className="flex flex-col gap-3 px-6 pt-5">
+                    <h2 className="text-brand-green text-sm font-bold">Categorias</h2>
+                    <div className="-mx-6 overflow-x-auto px-6">
+                        <div className="flex gap-2">
+                            {categories.map((category) => (
+                                <Link
+                                    key={category.id}
+                                    href={`/catalog?category_id=${category.id}`}
+                                    className="bg-brand-light-green text-brand-green shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+                                >
+                                    {category.name}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Featured Products */}
             {featuredProducts.length > 0 && (
