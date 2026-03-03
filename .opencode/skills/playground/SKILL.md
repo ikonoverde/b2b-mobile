@@ -15,12 +15,12 @@ When the user asks for an interactive playground, explorer, or visual tool for a
 
 1. **Identify the playground type** from the user's request
 2. **Load the matching template** from `templates/`:
-   - `templates/design-playground.md` — Visual design decisions (components, layouts, spacing, color, typography)
-   - `templates/data-explorer.md` — Data and query building (SQL, APIs, pipelines, regex)
-   - `templates/concept-map.md` — Learning and exploration (concept maps, knowledge gaps, scope mapping)
-   - `templates/document-critique.md` — Document review (suggestions with approve/reject/comment workflow)
-   - `templates/diff-review.md` — Code review (git diffs, commits, PRs with line-by-line commenting)
-   - `templates/code-map.md` — Codebase architecture (component relationships, data flow, layer diagrams)
+    - `templates/design-playground.md` — Visual design decisions (components, layouts, spacing, color, typography)
+    - `templates/data-explorer.md` — Data and query building (SQL, APIs, pipelines, regex)
+    - `templates/concept-map.md` — Learning and exploration (concept maps, knowledge gaps, scope mapping)
+    - `templates/document-critique.md` — Document review (suggestions with approve/reject/comment workflow)
+    - `templates/diff-review.md` — Code review (git diffs, commits, PRs with line-by-line commenting)
+    - `templates/code-map.md` — Codebase architecture (component relationships, data flow, layer diagrams)
 3. **Follow the template** to build the playground. If the topic doesn't fit any template cleanly, use the one closest and adapt.
 4. **Open in browser.** After writing the HTML file, run `open <filename>.html` to launch it in the user's default browser.
 
@@ -38,11 +38,13 @@ When the user asks for an interactive playground, explorer, or visual tool for a
 Keep a single state object. Every control writes to it, every render reads from it.
 
 ```javascript
-const state = { /* all configurable values */ };
+const state = {
+    /* all configurable values */
+};
 
 function updateAll() {
-  renderPreview(); // update the visual
-  updatePrompt();  // rebuild the prompt text
+    renderPreview(); // update the visual
+    updatePrompt(); // rebuild the prompt text
 }
 // Every control calls updateAll() on change
 ```
@@ -51,18 +53,18 @@ function updateAll() {
 
 ```javascript
 function updatePrompt() {
-  const parts = [];
+    const parts = [];
 
-  // Only mention non-default values
-  if (state.borderRadius !== DEFAULTS.borderRadius) {
-    parts.push(`border-radius of ${state.borderRadius}px`);
-  }
+    // Only mention non-default values
+    if (state.borderRadius !== DEFAULTS.borderRadius) {
+        parts.push(`border-radius of ${state.borderRadius}px`);
+    }
 
-  // Use qualitative language alongside numbers
-  if (state.shadowBlur > 16) parts.push('a pronounced shadow');
-  else if (state.shadowBlur > 0) parts.push('a subtle shadow');
+    // Use qualitative language alongside numbers
+    if (state.shadowBlur > 16) parts.push('a pronounced shadow');
+    else if (state.shadowBlur > 0) parts.push('a subtle shadow');
 
-  prompt.textContent = `Update the card to use ${parts.join(', ')}.`;
+    prompt.textContent = `Update the card to use ${parts.join(', ')}.`;
 }
 ```
 

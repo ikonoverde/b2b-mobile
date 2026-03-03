@@ -1,8 +1,10 @@
 import { Head, InfiniteScroll, router } from '@inertiajs/react';
-import { ChevronDown, Loader2, PackageOpen, Search, X } from 'lucide-react';
+import { ChevronDown, LayoutGrid, List, Loader2, PackageOpen, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { CatalogProductCard } from '@/components/catalog/CatalogProductCard';
+import { CatalogProductListCard } from '@/components/catalog/CatalogProductListCard';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types';
 
@@ -34,6 +36,7 @@ interface CatalogProps {
 
 export default function Catalog({ products, productsTotal, categories, selectedCategoryId, selectedSort }: CatalogProps) {
     const [search, setSearch] = useState('');
+    const [viewMode, setViewMode] = useLocalStorage<'grid' | 'list'>('catalog-view', 'grid');
 
     const filtered = useMemo(() => {
         if (!search.trim()) return products.data;
@@ -83,9 +86,31 @@ export default function Catalog({ products, productsTotal, categories, selectedC
             <div className="flex flex-col gap-4 px-6 pb-4 pt-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-brand-green text-xl font-bold">Catalogo</h1>
-                    <span className="text-brand-muted-text text-[13px] font-medium">
-                        {search ? filtered.length : productsTotal} {(search ? filtered.length : productsTotal) === 1 ? 'producto' : 'productos'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-brand-muted-text text-[13px] font-medium">
+                            {search ? filtered.length : productsTotal} {(search ? filtered.length : productsTotal) === 1 ? 'producto' : 'productos'}
+                        </span>
+                        <div className="flex overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-black/[0.06]">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={cn(
+                                    'flex h-8 w-8 items-center justify-center transition-colors',
+                                    viewMode === 'grid' ? 'bg-brand-light-green text-brand-green' : 'text-brand-muted-text',
+                                )}
+                            >
+                                <LayoutGrid className="h-4 w-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={cn(
+                                    'flex h-8 w-8 items-center justify-center transition-colors',
+                                    viewMode === 'list' ? 'bg-brand-light-green text-brand-green' : 'text-brand-muted-text',
+                                )}
+                            >
+                                <List className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Search */}
@@ -167,18 +192,31 @@ export default function Catalog({ products, productsTotal, categories, selectedC
                         </div>
                     }
                 >
-                    <div className="grid grid-cols-2 gap-3 px-6 pb-6">
-                        {filtered.map((product) => (
-                            <CatalogProductCard
-                                key={product.id}
-                                id={product.id}
-                                name={product.name}
-                                category={product.category.name}
-                                price={product.price}
-                                image={product.image}
-                                isFeatured={product.is_featured}
-                            />
-                        ))}
+                    <div className={viewMode === 'grid' ? 'grid grid-cols-2 gap-3 px-6 pb-6' : 'flex flex-col gap-3 px-6 pb-6'}>
+                        {filtered.map((product) =>
+                            viewMode === 'grid' ? (
+                                <CatalogProductCard
+                                    key={product.id}
+                                    id={product.id}
+                                    name={product.name}
+                                    category={product.category.name}
+                                    price={product.price}
+                                    image={product.image}
+                                    sku={product.sku}
+                                    isFeatured={product.is_featured}
+                                />
+                            ) : (
+                                <CatalogProductListCard
+                                    key={product.id}
+                                    id={product.id}
+                                    name={product.name}
+                                    category={product.category.name}
+                                    price={product.price}
+                                    image={product.image}
+                                    sku={product.sku}
+                                />
+                            ),
+                        )}
                     </div>
                 </InfiniteScroll>
             ) : (

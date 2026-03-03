@@ -16,8 +16,8 @@ export function BenefitCard({ icon: Icon, title, subtitle, iconBackground = 'gre
             <div className={`flex h-9 w-9 items-center justify-center rounded-full ${iconBgClass}`}>
                 <Icon className={`h-[18px] w-[18px] ${iconColorClass}`} />
             </div>
-            <span className="text-[15px] font-bold text-brand-green">{title}</span>
-            <span className="text-[11px] font-medium text-brand-accent-brown">{subtitle}</span>
+            <span className="text-brand-green text-[15px] font-bold">{title}</span>
+            <span className="text-brand-accent-brown text-[11px] font-medium">{subtitle}</span>
         </div>
     );
 }

@@ -39,10 +39,14 @@ function OrderCard({ order }: { order: Order }) {
     const subtotal = order.total_amount - order.shipping_cost;
 
     function handleReorder() {
-        router.post(`/orders/${order.id}/reorder`, {}, {
-            onStart: () => setReordering(true),
-            onFinish: () => setReordering(false),
-        });
+        router.post(
+            `/orders/${order.id}/reorder`,
+            {},
+            {
+                onStart: () => setReordering(true),
+                onFinish: () => setReordering(false),
+            },
+        );
     }
 
     return (
@@ -136,11 +140,7 @@ function OrderCard({ order }: { order: Order }) {
                             disabled={reordering}
                             className="bg-brand-green mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-60"
                         >
-                            {reordering ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <RefreshCw className="h-4 w-4" />
-                            )}
+                            {reordering ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                             Volver a Pedir
                         </button>
                     </div>
